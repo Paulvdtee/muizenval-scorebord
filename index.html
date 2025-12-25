@@ -966,6 +966,44 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        // VERVANG DIT MET JE EIGEN FIREBASE CONFIGURATIE
+        // Zie README.md voor instructies
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase (only if config is valid)
+        let firebaseApp = null;
+        let database = null;
+        let useFirebase = false;
+
+        try {
+            if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                useFirebase = true;
+                console.log('✅ Firebase verbonden - data wordt gedeeld tussen apparaten');
+            } else {
+                console.log('ℹ️ Firebase niet geconfigureerd - gebruikt localStorage (lokaal)');
+            }
+        } catch (error) {
+            console.error('Firebase initialisatie fout:', error);
+            useFirebase = false;
+        }
+    </script>
+
     <script>
         // Default trap positions (1-15, unique)
         const defaultPositions = {
@@ -987,12 +1025,13 @@
         };
 
         // Data management
-        let catches = JSON.parse(localStorage.getItem('muizenval-catches') || '[]');
-        let trapPositions = JSON.parse(localStorage.getItem('muizenval-positions') || 'null') || {...defaultPositions};
+        let catches = [];
+        let trapPositions = {...defaultPositions};
         let currentTrap = null;
         let currentPhoto = null;
         let editMode = false;
         let draggingTrap = null;
+        let dataLoaded = false;
 
         // DOM Elements
         const totalScoreEl = document.getElementById('totalScore');
@@ -1008,10 +1047,90 @@
         const editToggle = document.getElementById('editToggle');
         const instruction = document.getElementById('instruction');
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        // Data loading functions
+        function loadData() {
+            if (useFirebase && database) {
+                try {
+                    // Load catches from Firebase
+                    const catchesRef = database.ref('catches');
+                    catchesRef.on('value', (snapshot) => {
+                        catches = snapshot.val() || [];
+                        updateUI();
+                    });
+
+                    // Load trap positions from Firebase
+                    const positionsRef = database.ref('trapPositions');
+                    positionsRef.on('value', (snapshot) => {
+                        const savedPositions = snapshot.val();
+                        if (savedPositions) {
+                            trapPositions = {...defaultPositions, ...savedPositions};
+                        }
+                        renderTraps();
+                        if (!dataLoaded) {
+                            dataLoaded = true;
+                            showToast('✅ Verbonden - data wordt gesynchroniseerd');
+                        }
+                    });
+
+                    // Initial load - wait for first data
+                    catchesRef.once('value', (snapshot) => {
+                        catches = snapshot.val() || [];
+                        positionsRef.once('value', (snapshot) => {
+                            const savedPositions = snapshot.val();
+                            if (savedPositions) {
+                                trapPositions = {...defaultPositions, ...savedPositions};
+                            }
+                            renderTraps();
+                            updateUI();
+                            if (!dataLoaded) {
+                                dataLoaded = true;
+                                showToast('✅ Verbonden - data wordt gesynchroniseerd');
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('Firebase load error:', error);
+                    loadFromLocalStorage();
+                }
+            } else {
+                loadFromLocalStorage();
+            }
+        }
+
+        function loadFromLocalStorage() {
+            catches = JSON.parse(localStorage.getItem('muizenval-catches') || '[]');
+            const savedPositions = JSON.parse(localStorage.getItem('muizenval-positions') || 'null');
+            if (savedPositions) {
+                trapPositions = {...defaultPositions, ...savedPositions};
+            }
+            dataLoaded = true;
             renderTraps();
             updateUI();
+        }
+
+        function saveData() {
+            if (useFirebase && database) {
+                try {
+                    // Save to Firebase
+                    database.ref('catches').set(catches);
+                    database.ref('trapPositions').set(trapPositions);
+                } catch (error) {
+                    console.error('Firebase save error:', error);
+                    saveToLocalStorage();
+                }
+            } else {
+                saveToLocalStorage();
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('muizenval-catches', JSON.stringify(catches));
+            localStorage.setItem('muizenval-positions', JSON.stringify(trapPositions));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
             setupEventListeners();
             setDefaultDateTime();
         });
@@ -1159,7 +1278,7 @@
 
             // Save new position
             trapPositions[trapNum] = { left, top };
-            localStorage.setItem('muizenval-positions', JSON.stringify(trapPositions));
+            saveData();
 
             draggingTrap.classList.remove('dragging');
             draggingTrap = null;
@@ -1230,7 +1349,7 @@
             };
 
             catches.unshift(newCatch);
-            localStorage.setItem('muizenval-catches', JSON.stringify(catches));
+            saveData();
             
             closeModal();
             updateUI();
@@ -1244,7 +1363,7 @@
             if (!confirm('Weet je zeker dat je deze vangst wilt verwijderen?')) return;
             
             catches = catches.filter(c => c.id !== id);
-            localStorage.setItem('muizenval-catches', JSON.stringify(catches));
+            saveData();
             updateUI();
         }
 
