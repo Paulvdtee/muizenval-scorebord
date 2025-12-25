@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🐭 Muizenval Scorebord</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --primary-light: #FFE3E3;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --background: #FAFAFA;
+            --card-bg: #FFFFFF;
+            --text: #2D3436;
+            --text-light: #636E72;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --edit-mode: #9B59B6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 50%, #FFECD2 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--secondary), #45B7AA);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 0.75rem;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            position: sticky;
+            top: 120px;
+            z-index: 99;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+            color: var(--text-light);
+            box-shadow: var(--shadow);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Content sections */
+        .content {
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Plattegrond */
+        .plattegrond-container {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+        }
+
+        .plattegrond-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .plattegrond-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .edit-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--edit-mode);
+            border-radius: 50px;
+            background: transparent;
+            color: var(--edit-mode);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-toggle:hover, .edit-toggle.active {
+            background: var(--edit-mode);
+            color: white;
+        }
+
+        .edit-toggle.active {
+            animation: editPulse 1.5s infinite;
+        }
+
+        @keyframes editPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(155, 89, 182, 0); }
+        }
+
+        .plattegrond {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 0.65;
+            background: linear-gradient(180deg, #F8F9FA 0%, #E9ECEF 100%);
+            border: 3px solid var(--text);
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .plattegrond.edit-mode {
+            border-color: var(--edit-mode);
+            background: linear-gradient(180deg, #F5EEF8 0%, #E8DAEF 100%);
+        }
+
+        /* Muren en structuur */
+        .wall {
+            position: absolute;
+            background: var(--text);
+            pointer-events: none;
+        }
+
+        .wall-h {
+            height: 3px;
+            width: 100%;
+        }
+
+        .wall-v {
+            width: 3px;
+            height: 100%;
+        }
+
+        .trap-luik {
+            position: absolute;
+            width: 15%;
+            height: 10%;
+            left: 30%;
+            top: 35%;
+            background: repeating-linear-gradient(
+                45deg,
+                #DDD,
+                #DDD 4px,
+                #BBB 4px,
+                #BBB 8px
+            );
+            border: 2px solid var(--text);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .deur {
+            position: absolute;
+            bottom: -3px;
+            left: 35%;
+            width: 30%;
+            height: 20px;
+            background: var(--card-bg);
+            border: 3px solid var(--text);
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+            pointer-events: none;
+        }
+
+        /* Muizenval buttons */
+        .muizenval {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid var(--text);
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .muizenval:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .muizenval:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        .muizenval.has-catch {
+            background: linear-gradient(135deg, var(--primary), #E55555);
+            color: white;
+            border-color: #C0392B;
+            animation: pulse 2s infinite;
+        }
+
+        .muizenval.dragging {
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 100;
+            opacity: 0.9;
+        }
+
+        .plattegrond.edit-mode .muizenval {
+            border-color: var(--edit-mode);
+            cursor: grab;
+        }
+
+        .plattegrond.edit-mode .muizenval:active {
+            cursor: grabbing;
+        }
+
+        .plattegrond.edit-mode .muizenval::after {
+            content: '✋';
+            position: absolute;
+            top: -20px;
+            font-size: 0.8rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4); }
+            50% { box-shadow: 0 3px 20px rgba(255, 107, 107, 0.8); }
+        }
+
+        .muizenval .catch-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: var(--text);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* Instructie */
+        .instruction {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+        }
+
+        .instruction.edit-mode {
+            background: rgba(155, 89, 182, 0.1);
+            color: var(--edit-mode);
+            border: 2px dashed var(--edit-mode);
+        }
+
+        .instruction span {
+            font-size: 1.5rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-hover);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), #E55555);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .modal-header h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .modal-header .trap-number {
+            font-size: 3rem;
+            margin-top: 0.5rem;
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E9ECEF;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        /* Photo upload */
+        .photo-upload {
+            border: 3px dashed #DDD;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #FAFAFA;
+        }
+
+        .photo-upload:hover {
+            border-color: var(--secondary);
+            background: rgba(78, 205, 196, 0.05);
+        }
+
+        .photo-upload.has-photo {
+            padding: 0.5rem;
+            border-style: solid;
+            border-color: var(--secondary);
+        }
+
+        .photo-upload input {
+            display: none;
+        }
+
+        .photo-upload .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .photo-upload .text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .photo-upload img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), #45B7AA);
+            color: white;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
+        }
+
+        .btn-secondary {
+            background: #F1F3F4;
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: #E9ECEF;
+        }
+
+        /* Vangsten lijst */
+        .vangsten-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .vangsten-header h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .vangst-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .vangst-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #F1F3F4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .vangst-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .vangst-info {
+            flex: 1;
+        }
+
+        .vangst-info .trap-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), #E55555);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .vangst-info .datetime {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .vangst-info .date {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .vangst-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .vangst-actions button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete {
+            background: #FFE3E3;
+            color: var(--primary);
+        }
+
+        .btn-delete:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-view {
+            background: #E3F9F7;
+            color: var(--secondary);
+        }
+
+        .btn-view:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-light);
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        /* Photo viewer modal */
+        .photo-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+
+        .photo-viewer.active {
+            display: flex;
+        }
+
+        .photo-viewer img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .photo-viewer .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .photo-viewer .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Statistieken */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card .value {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card .label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .top-traps {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .top-traps h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .trap-rank {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #F1F3F4;
+        }
+
+        .trap-rank:last-child {
+            border-bottom: none;
+        }
+
+        .trap-rank .rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #FFD93D);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .trap-rank .trap-name {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .trap-rank .count {
+            color: var(--primary);
+            font-weight: 700;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .muizenval {
+                width: 32px;
+                height: 32px;
+                font-size: 0.7rem;
+            }
+
+            .muizenval .catch-count {
+                width: 18px;
+                height: 18px;
+                font-size: 0.6rem;
+                top: -6px;
+                right: -6px;
+            }
+
+            .plattegrond.edit-mode .muizenval::after {
+                font-size: 0.6rem;
+                top: -16px;
+            }
+        }
+
+        /* Confetti animation */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 3000;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: var(--shadow-hover);
+            z-index: 1500;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🐭 Muizenval Scorebord</h1>
+        <p class="subtitle">Zolder Jacht Editie</p>
+        <div class="score-badge">
+            <span>🏆</span>
+            <span id="totalScore">0</span>
+            <span>muizen gevangen</span>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="plattegrond">📍 Plattegrond</button>
+        <button class="tab-btn" data-tab="vangsten">📋 Vangsten</button>
+        <button class="tab-btn" data-tab="stats">📊 Stats</button>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Plattegrond Section -->
+        <div id="plattegrond" class="section active">
+            <div class="plattegrond-container">
+                <div class="plattegrond-header">
+                    <div class="plattegrond-title">🏠 Zolder Plattegrond</div>
+                    <button class="edit-toggle" id="editToggle">
+                        <span>✏️</span>
+                        <span>Bewerken</span>
+                    </button>
+                </div>
+                <div class="plattegrond" id="plattegrondArea">
+                    <!-- Horizontale scheidingsmuren -->
+                    <div class="wall wall-h" style="top: 28%; left: 0; width: 52%;"></div>
+                    <div class="wall wall-h" style="top: 28%; left: 70%; width: 30%;"></div>
+                    <div class="wall wall-h" style="top: 62%; left: 0; width: 70%;"></div>
+                    <div class="wall wall-h" style="top: 62%; left: 75%; width: 25%;"></div>
+                    
+                    <!-- Trap/luik -->
+                    <div class="trap-luik"></div>
+                    
+                    <!-- Deur onderaan -->
+                    <div class="deur"></div>
+
+                    <!-- Muizenvallen worden dynamisch gegenereerd -->
+                </div>
+            </div>
+            
+            <div class="instruction" id="instruction">
+                <span>👆</span>
+                <p>Tik op een muizenval om een vangst te registreren!</p>
+            </div>
+        </div>
+
+        <!-- Vangsten Section -->
+        <div id="vangsten" class="section">
+            <div class="vangsten-header">
+                <h2>🎯 Alle Vangsten</h2>
+            </div>
+            <div id="vangsten-list">
+                <!-- Dynamisch gevuld -->
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div id="stats" class="section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value" id="statTotal">0</div>
+                    <div class="label">Totaal gevangen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="statThisWeek">0</div>
+                    <div class="label">Deze week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="statThisMonth">0</div>
+                    <div class="label">Deze maand</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="statActiveTraps">0</div>
+                    <div class="label">Actieve vallen</div>
+                </div>
+            </div>
+            
+            <div class="top-traps">
+                <h3>🏆 Top Muizenvallen</h3>
+                <div id="topTraps">
+                    <!-- Dynamisch gevuld -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal voor nieuwe vangst -->
+    <div class="modal-overlay" id="catchModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>🎉 Nieuwe Vangst!</h2>
+                <div class="trap-number">Val #<span id="modalTrapNumber">1</span></div>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label>📅 Datum</label>
+                    <input type="date" id="catchDate">
+                </div>
+                <div class="form-group">
+                    <label>⏰ Tijdstip</label>
+                    <input type="time" id="catchTime">
+                </div>
+                <div class="form-group">
+                    <label>📸 Foto van de muis (optioneel)</label>
+                    <div class="photo-upload" id="photoUpload">
+                        <input type="file" id="photoInput" accept="image/*" capture="environment">
+                        <div class="icon">📷</div>
+                        <div class="text">Tik om een foto te maken of te kiezen</div>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary" id="cancelBtn">Annuleren</button>
+                    <button class="btn btn-primary" id="saveBtn">💾 Opslaan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo viewer -->
+    <div class="photo-viewer" id="photoViewer">
+        <button class="close-btn" id="closeViewer">✕</button>
+        <img src="" alt="Foto" id="viewerImage">
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Default trap positions (1-15, unique)
+        const defaultPositions = {
+            1: { left: 10, top: 88 },
+            2: { left: 22, top: 8 },
+            3: { left: 30, top: 88 },
+            4: { left: 65, top: 88 },
+            5: { left: 90, top: 88 },
+            6: { left: 82, top: 70 },
+            7: { left: 42, top: 8 },
+            8: { left: 88, top: 8 },
+            9: { left: 20, top: 36 },
+            10: { left: 10, top: 16 },
+            11: { left: 22, top: 14 },
+            12: { left: 22, top: 24 },
+            13: { left: 75, top: 36 },
+            14: { left: 25, top: 52 },
+            15: { left: 85, top: 20 }
+        };
+
+        // Data management
+        let catches = JSON.parse(localStorage.getItem('muizenval-catches') || '[]');
+        let trapPositions = JSON.parse(localStorage.getItem('muizenval-positions') || 'null') || {...defaultPositions};
+        let currentTrap = null;
+        let currentPhoto = null;
+        let editMode = false;
+        let draggingTrap = null;
+
+        // DOM Elements
+        const totalScoreEl = document.getElementById('totalScore');
+        const catchModal = document.getElementById('catchModal');
+        const modalTrapNumber = document.getElementById('modalTrapNumber');
+        const catchDate = document.getElementById('catchDate');
+        const catchTime = document.getElementById('catchTime');
+        const photoUpload = document.getElementById('photoUpload');
+        const photoInput = document.getElementById('photoInput');
+        const photoViewer = document.getElementById('photoViewer');
+        const viewerImage = document.getElementById('viewerImage');
+        const plattegrondArea = document.getElementById('plattegrondArea');
+        const editToggle = document.getElementById('editToggle');
+        const instruction = document.getElementById('instruction');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTraps();
+            updateUI();
+            setupEventListeners();
+            setDefaultDateTime();
+        });
+
+        function renderTraps() {
+            // Remove existing traps
+            document.querySelectorAll('.muizenval').forEach(el => el.remove());
+
+            // Create traps based on positions
+            for (let i = 1; i <= 15; i++) {
+                const pos = trapPositions[i];
+                const trap = document.createElement('button');
+                trap.className = 'muizenval';
+                trap.dataset.trap = i;
+                trap.textContent = i;
+                trap.style.left = pos.left + '%';
+                trap.style.top = pos.top + '%';
+                plattegrondArea.appendChild(trap);
+            }
+
+            // Reattach event listeners
+            attachTrapListeners();
+        }
+
+        function attachTrapListeners() {
+            document.querySelectorAll('.muizenval').forEach(trap => {
+                // Click handler
+                trap.addEventListener('click', (e) => {
+                    if (!editMode) {
+                        openModal(trap.dataset.trap);
+                    }
+                });
+
+                // Touch/Mouse drag handlers for edit mode
+                trap.addEventListener('mousedown', startDrag);
+                trap.addEventListener('touchstart', startDrag, { passive: false });
+            });
+        }
+
+        function setupEventListeners() {
+            // Tab navigation
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Edit toggle
+            editToggle.addEventListener('click', toggleEditMode);
+
+            // Modal buttons
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            document.getElementById('saveBtn').addEventListener('click', saveCatch);
+
+            // Photo upload
+            photoUpload.addEventListener('click', () => photoInput.click());
+            photoInput.addEventListener('change', handlePhotoUpload);
+
+            // Photo viewer
+            document.getElementById('closeViewer').addEventListener('click', () => {
+                photoViewer.classList.remove('active');
+            });
+            photoViewer.addEventListener('click', (e) => {
+                if (e.target === photoViewer) photoViewer.classList.remove('active');
+            });
+
+            // Close modal on overlay click
+            catchModal.addEventListener('click', (e) => {
+                if (e.target === catchModal) closeModal();
+            });
+
+            // Global mouse/touch move and end for dragging
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            editToggle.classList.toggle('active', editMode);
+            plattegrondArea.classList.toggle('edit-mode', editMode);
+            instruction.classList.toggle('edit-mode', editMode);
+
+            if (editMode) {
+                instruction.innerHTML = `
+                    <span>✋</span>
+                    <p>Sleep de vallen naar de gewenste positie. Tik op "Bewerken" om te stoppen.</p>
+                `;
+            } else {
+                instruction.innerHTML = `
+                    <span>👆</span>
+                    <p>Tik op een muizenval om een vangst te registreren!</p>
+                `;
+            }
+        }
+
+        function startDrag(e) {
+            if (!editMode) return;
+            
+            e.preventDefault();
+            const trap = e.target.closest('.muizenval');
+            if (!trap) return;
+
+            draggingTrap = trap;
+            trap.classList.add('dragging');
+        }
+
+        function drag(e) {
+            if (!draggingTrap || !editMode) return;
+            
+            e.preventDefault();
+            
+            const rect = plattegrondArea.getBoundingClientRect();
+            let clientX, clientY;
+
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            let left = ((clientX - rect.left) / rect.width) * 100;
+            let top = ((clientY - rect.top) / rect.height) * 100;
+
+            // Clamp to boundaries
+            left = Math.max(5, Math.min(95, left));
+            top = Math.max(5, Math.min(95, top));
+
+            draggingTrap.style.left = left + '%';
+            draggingTrap.style.top = top + '%';
+        }
+
+        function endDrag() {
+            if (!draggingTrap) return;
+
+            const trapNum = draggingTrap.dataset.trap;
+            const left = parseFloat(draggingTrap.style.left);
+            const top = parseFloat(draggingTrap.style.top);
+
+            // Save new position
+            trapPositions[trapNum] = { left, top };
+            localStorage.setItem('muizenval-positions', JSON.stringify(trapPositions));
+
+            draggingTrap.classList.remove('dragging');
+            draggingTrap = null;
+
+            showToast('Positie opgeslagen!');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function setDefaultDateTime() {
+            const now = new Date();
+            catchDate.value = now.toISOString().split('T')[0];
+            catchTime.value = now.toTimeString().slice(0, 5);
+        }
+
+        function openModal(trapNumber) {
+            currentTrap = trapNumber;
+            currentPhoto = null;
+            modalTrapNumber.textContent = trapNumber;
+            setDefaultDateTime();
+            
+            // Reset photo upload
+            photoUpload.innerHTML = `
+                <input type="file" id="photoInput" accept="image/*" capture="environment">
+                <div class="icon">📷</div>
+                <div class="text">Tik om een foto te maken of te kiezen</div>
+            `;
+            photoUpload.classList.remove('has-photo');
+            document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+            
+            catchModal.classList.add('active');
+        }
+
+        function closeModal() {
+            catchModal.classList.remove('active');
+            currentTrap = null;
+            currentPhoto = null;
+        }
+
+        function handlePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentPhoto = event.target.result;
+                photoUpload.innerHTML = `<img src="${currentPhoto}" alt="Preview">`;
+                photoUpload.classList.add('has-photo');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveCatch() {
+            if (!currentTrap) return;
+
+            const newCatch = {
+                id: Date.now(),
+                trap: currentTrap,
+                date: catchDate.value,
+                time: catchTime.value,
+                photo: currentPhoto,
+                createdAt: new Date().toISOString()
+            };
+
+            catches.unshift(newCatch);
+            localStorage.setItem('muizenval-catches', JSON.stringify(catches));
+            
+            closeModal();
+            updateUI();
+            showConfetti();
+            
+            // Switch to vangsten tab to show new entry
+            document.querySelector('[data-tab="vangsten"]').click();
+        }
+
+        function deleteCatch(id) {
+            if (!confirm('Weet je zeker dat je deze vangst wilt verwijderen?')) return;
+            
+            catches = catches.filter(c => c.id !== id);
+            localStorage.setItem('muizenval-catches', JSON.stringify(catches));
+            updateUI();
+        }
+
+        function viewPhoto(photoData) {
+            viewerImage.src = photoData;
+            photoViewer.classList.add('active');
+        }
+
+        function updateUI() {
+            // Update total score
+            totalScoreEl.textContent = catches.length;
+            document.getElementById('statTotal').textContent = catches.length;
+
+            // Update trap indicators
+            const trapCounts = {};
+            catches.forEach(c => {
+                trapCounts[c.trap] = (trapCounts[c.trap] || 0) + 1;
+            });
+
+            document.querySelectorAll('.muizenval').forEach(trap => {
+                const trapNum = trap.dataset.trap;
+                const count = trapCounts[trapNum] || 0;
+                
+                // Remove existing count badge
+                const existingBadge = trap.querySelector('.catch-count');
+                if (existingBadge) existingBadge.remove();
+                
+                // Update text to show only the number
+                trap.textContent = trapNum;
+                
+                if (count > 0) {
+                    trap.classList.add('has-catch');
+                    const badge = document.createElement('span');
+                    badge.className = 'catch-count';
+                    badge.textContent = count;
+                    trap.appendChild(badge);
+                } else {
+                    trap.classList.remove('has-catch');
+                }
+            });
+
+            // Update vangsten list
+            updateVangstenList();
+
+            // Update stats
+            updateStats();
+        }
+
+        function updateVangstenList() {
+            const list = document.getElementById('vangsten-list');
+            
+            if (catches.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🐭</div>
+                        <h3>Nog geen vangsten</h3>
+                        <p>Tik op een muizenval om je eerste vangst te registreren!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = catches.map(c => {
+                const date = new Date(c.date);
+                const formattedDate = date.toLocaleDateString('nl-NL', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                return `
+                    <div class="vangst-card">
+                        <div class="vangst-photo">
+                            ${c.photo 
+                                ? `<img src="${c.photo}" alt="Muisfoto" onclick="viewPhoto('${c.photo}')">`
+                                : '🐭'}
+                        </div>
+                        <div class="vangst-info">
+                            <span class="trap-badge">Val #${c.trap}</span>
+                            <div class="date">${formattedDate}</div>
+                            <div class="datetime">⏰ ${c.time}</div>
+                        </div>
+                        <div class="vangst-actions">
+                            ${c.photo ? `<button class="btn-view" onclick="viewPhoto('${c.photo}')">👁</button>` : ''}
+                            <button class="btn-delete" onclick="deleteCatch(${c.id})">🗑</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            const thisWeek = catches.filter(c => new Date(c.date) >= weekAgo).length;
+            const thisMonth = catches.filter(c => new Date(c.date) >= monthStart).length;
+
+            document.getElementById('statThisWeek').textContent = thisWeek;
+            document.getElementById('statThisMonth').textContent = thisMonth;
+
+            // Total traps (always 15)
+            document.getElementById('statActiveTraps').textContent = 15;
+
+            // Top traps
+            const trapCounts = {};
+            catches.forEach(c => {
+                trapCounts[c.trap] = (trapCounts[c.trap] || 0) + 1;
+            });
+
+            const sortedTraps = Object.entries(trapCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const topTrapsEl = document.getElementById('topTraps');
+            
+            if (sortedTraps.length === 0) {
+                topTrapsEl.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 1rem;">Nog geen data beschikbaar</p>';
+                return;
+            }
+
+            topTrapsEl.innerHTML = sortedTraps.map(([trap, count], i) => `
+                <div class="trap-rank">
+                    <div class="rank">${i + 1}</div>
+                    <div class="trap-name">Muizenval #${trap}</div>
+                    <div class="count">${count} 🐭</div>
+                </div>
+            `).join('');
+        }
+
+        function showConfetti() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3'];
+            
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.cssText = `
+                    position: fixed;
+                    left: ${Math.random() * 100}vw;
+                    top: -20px;
+                    width: ${Math.random() * 10 + 5}px;
+                    height: ${Math.random() * 10 + 5}px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                    animation: fall ${Math.random() * 2 + 2}s linear forwards;
+                    z-index: 3000;
+                `;
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 4000);
+            }
+
+            // Add keyframes if not exists
+            if (!document.querySelector('#confetti-style')) {
+                const style = document.createElement('style');
+                style.id = 'confetti-style';
+                style.textContent = `
+                    @keyframes fall {
+                        to {
+                            transform: translateY(100vh) rotate(720deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Make functions global for onclick handlers
+        window.viewPhoto = viewPhoto;
+        window.deleteCatch = deleteCatch;
+    </script>
+</body>
+</html>
