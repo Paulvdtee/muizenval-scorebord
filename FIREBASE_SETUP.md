@@ -78,7 +78,11 @@ const firebaseConfig = {
 
 5. Klik "Publish"
 
-⚠️ **Belangrijk:** Deze regels maken de database publiek toegankelijk. Voor persoonlijk gebruik is dit prima, maar voor productie gebruik zou je authenticatie moeten toevoegen.
+⚠️ **Belangrijk:** Deze regels maken de database publiek toegankelijk. 
+
+**Voor beveiliging met authenticatie, zie `AUTH_SETUP.md` voor instructies om:**
+- Iedereen te laten bekijken (read)
+- Alleen geautoriseerde gebruikers te laten wijzigen (write)
 
 ### 7. Test de App
 1. Open `index.html` in je browser

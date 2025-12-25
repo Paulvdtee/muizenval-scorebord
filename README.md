@@ -73,7 +73,9 @@ De applicatie werkt standaard met **localStorage** (data blijft lokaal op elk ap
    ```
    - Klik "Publish"
    
-   ⚠️ **Let op:** Deze regels maken de database publiek leesbaar/schrijfbaar. Voor productie gebruik, pas dit aan met authenticatie.
+   ⚠️ **Let op:** Deze regels maken de database publiek leesbaar/schrijfbaar. 
+   
+   **Voor beveiliging met authenticatie (aanbevolen):** Zie `AUTH_SETUP.md` voor instructies om alleen geautoriseerde gebruikers te laten wijzigen.
 
 ### Zonder Firebase:
 Als je Firebase niet configureert, werkt de app gewoon met localStorage. Data blijft dan lokaal op elk apparaat.

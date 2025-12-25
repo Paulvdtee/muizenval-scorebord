@@ -836,10 +836,16 @@
     <header class="header">
         <h1>🐭 Muizenval Scorebord</h1>
         <p class="subtitle">Zolder Jacht Editie</p>
-        <div class="score-badge">
-            <span>🏆</span>
-            <span id="totalScore">0</span>
-            <span>muizen gevangen</span>
+        <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 0.5rem;">
+            <div class="score-badge">
+                <span>🏆</span>
+                <span id="totalScore">0</span>
+                <span>muizen gevangen</span>
+            </div>
+            <div id="userBadge" style="display: none; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">
+                <span id="userEmailBadge"></span>
+                <button id="headerLogoutBtn" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1rem;" title="Uitloggen">🚪</button>
+            </div>
         </div>
     </header>
 
@@ -966,9 +972,47 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal" style="max-width: 350px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--secondary), #45B7AA);">
+                <h2>🔐 Inloggen</h2>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9;">Alleen bekijken? Klik op "Bekijken zonder inloggen"</p>
+            </div>
+            <div class="modal-content">
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>📧 Email</label>
+                        <input type="email" id="loginEmail" placeholder="jouw@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label>🔑 Wachtwoord</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                    <div id="loginError" style="color: var(--primary); font-size: 0.85rem; margin-bottom: 1rem; display: none;"></div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="loginBtn">🔓 Inloggen</button>
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E9ECEF;">
+                        <button class="btn btn-secondary" id="viewOnlyBtn" style="width: 100%;">👁️ Bekijken zonder inloggen</button>
+                    </div>
+                </div>
+                <div id="userInfo" style="display: none;">
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;" id="userEmail"></div>
+                        <div style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 1rem;">Je bent ingelogd</div>
+                        <button class="btn btn-secondary" id="logoutBtn" style="width: 100%;">Uitloggen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
         // Firebase Configuration
@@ -987,12 +1031,16 @@
         // Initialize Firebase (only if config is valid)
         let firebaseApp = null;
         let database = null;
+        let auth = null;
         let useFirebase = false;
+        let currentUser = null;
+        let isAuthenticated = false;
 
         try {
             if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
                 firebaseApp = firebase.initializeApp(firebaseConfig);
                 database = firebase.database();
+                auth = firebase.auth();
                 useFirebase = true;
                 console.log('✅ Firebase verbonden - data wordt gedeeld tussen apparaten');
             } else {
@@ -1032,10 +1080,12 @@
         let editMode = false;
         let draggingTrap = null;
         let dataLoaded = false;
+        let viewOnlyMode = false;
 
         // DOM Elements
         const totalScoreEl = document.getElementById('totalScore');
         const catchModal = document.getElementById('catchModal');
+        const loginModal = document.getElementById('loginModal');
         const modalTrapNumber = document.getElementById('modalTrapNumber');
         const catchDate = document.getElementById('catchDate');
         const catchTime = document.getElementById('catchTime');
@@ -1109,18 +1159,138 @@
         }
 
         function saveData() {
-            if (useFirebase && database) {
+            // Only save if authenticated (or not using Firebase)
+            if (!useFirebase) {
+                saveToLocalStorage();
+                return;
+            }
+
+            if (!isAuthenticated && !viewOnlyMode) {
+                showToast('⚠️ Je moet ingelogd zijn om wijzigingen op te slaan');
+                return;
+            }
+
+            if (useFirebase && database && isAuthenticated) {
                 try {
                     // Save to Firebase
                     database.ref('catches').set(catches);
                     database.ref('trapPositions').set(trapPositions);
                 } catch (error) {
                     console.error('Firebase save error:', error);
-                    saveToLocalStorage();
+                    showToast('❌ Fout bij opslaan: ' + error.message);
                 }
             } else {
                 saveToLocalStorage();
             }
+        }
+
+        // Authentication functions
+        async function signInWithEmail(email, password) {
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                isAuthenticated = true;
+                viewOnlyMode = false;
+                loginModal.classList.remove('active');
+                showToast('✅ Ingelogd! Je kunt nu wijzigingen maken.');
+                updateUIForAuth();
+                return true;
+            } catch (error) {
+                document.getElementById('loginError').textContent = error.message;
+                document.getElementById('loginError').style.display = 'block';
+                return false;
+            }
+        }
+
+        async function signInAnonymously() {
+            try {
+                const userCredential = await auth.signInAnonymously();
+                currentUser = userCredential.user;
+                isAuthenticated = false; // Anonymous users can't write
+                viewOnlyMode = true;
+                loginModal.classList.remove('active');
+                showToast('👁️ Bekijkmodus - je kunt alleen bekijken');
+                updateUIForAuth();
+                return true;
+            } catch (error) {
+                console.error('Anonymous sign-in error:', error);
+                showToast('❌ Fout bij anoniem inloggen');
+                return false;
+            }
+        }
+
+        async function signOut() {
+            try {
+                await auth.signOut();
+                currentUser = null;
+                isAuthenticated = false;
+                viewOnlyMode = false;
+                showToast('👋 Uitgelogd');
+                updateUIForAuth();
+                loginModal.classList.add('active');
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
+        function updateUIForAuth() {
+            // Update user badge in header
+            const userBadge = document.getElementById('userBadge');
+            const userEmailBadge = document.getElementById('userEmailBadge');
+            if (userBadge && userEmailBadge) {
+                if (currentUser && !currentUser.isAnonymous) {
+                    userBadge.style.display = 'flex';
+                    userEmailBadge.textContent = currentUser.email || 'Ingelogd';
+                } else {
+                    userBadge.style.display = 'none';
+                }
+            }
+
+            // Hide/show edit button
+            if (editToggle) {
+                if (isAuthenticated) {
+                    editToggle.style.display = 'flex';
+                } else {
+                    editToggle.style.display = 'none';
+                }
+            }
+
+            // Disable trap clicks for non-authenticated users
+            document.querySelectorAll('.muizenval').forEach(trap => {
+                if (!isAuthenticated && !viewOnlyMode) {
+                    trap.style.opacity = '0.6';
+                    trap.style.cursor = 'not-allowed';
+                } else if (viewOnlyMode) {
+                    trap.style.opacity = '0.8';
+                    trap.style.cursor = 'default';
+                } else {
+                    trap.style.opacity = '1';
+                    trap.style.cursor = 'pointer';
+                }
+            });
+
+            // Update instruction text
+            if (instruction) {
+                if (viewOnlyMode) {
+                    instruction.innerHTML = `
+                        <span>👁️</span>
+                        <p>Bekijkmodus - log in om wijzigingen te maken</p>
+                    `;
+                } else if (!isAuthenticated) {
+                    instruction.innerHTML = `
+                        <span>🔐</span>
+                        <p>Log in om vangsten toe te voegen of de plattegrond aan te passen</p>
+                    `;
+                } else {
+                    instruction.innerHTML = `
+                        <span>👆</span>
+                        <p>Tik op een muizenval om een vangst te registreren!</p>
+                    `;
+                }
+            }
+
+            // Update vangsten list to show/hide delete buttons
+            updateVangstenList();
         }
 
         function saveToLocalStorage() {
@@ -1130,9 +1300,39 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            loadData();
             setupEventListeners();
             setDefaultDateTime();
+            
+            // Setup Firebase Auth state listener
+            if (useFirebase && auth) {
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        currentUser = user;
+                        // Check if user is anonymous
+                        if (user.isAnonymous) {
+                            isAuthenticated = false;
+                            viewOnlyMode = true;
+                        } else {
+                            isAuthenticated = true;
+                            viewOnlyMode = false;
+                        }
+                        updateUIForAuth();
+                        loadData();
+                    } else {
+                        // No user, show login modal
+                        currentUser = null;
+                        isAuthenticated = false;
+                        viewOnlyMode = false;
+                        loginModal.classList.add('active');
+                        updateUIForAuth();
+                        // Still load data for viewing
+                        loadData();
+                    }
+                });
+            } else {
+                // No Firebase, just load data
+                loadData();
+            }
         });
 
         function renderTraps() {
@@ -1160,6 +1360,15 @@
                 // Click handler
                 trap.addEventListener('click', (e) => {
                     if (!editMode) {
+                        if (!isAuthenticated && !viewOnlyMode) {
+                            showToast('🔐 Log in om een vangst toe te voegen');
+                            loginModal.classList.add('active');
+                            return;
+                        }
+                        if (viewOnlyMode) {
+                            showToast('👁️ Bekijkmodus - log in om wijzigingen te maken');
+                            return;
+                        }
                         openModal(trap.dataset.trap);
                     }
                 });
@@ -1182,7 +1391,48 @@
             });
 
             // Edit toggle
-            editToggle.addEventListener('click', toggleEditMode);
+            if (editToggle) {
+                editToggle.addEventListener('click', () => {
+                    if (!isAuthenticated) {
+                        showToast('🔐 Log in om de plattegrond aan te passen');
+                        loginModal.classList.add('active');
+                        return;
+                    }
+                    toggleEditMode();
+                });
+            }
+
+            // Login modal buttons
+            document.getElementById('loginBtn').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                if (!email || !password) {
+                    document.getElementById('loginError').textContent = 'Vul email en wachtwoord in';
+                    document.getElementById('loginError').style.display = 'block';
+                    return;
+                }
+                await signInWithEmail(email, password);
+            });
+
+            document.getElementById('viewOnlyBtn').addEventListener('click', async () => {
+                await signInAnonymously();
+            });
+
+            if (document.getElementById('logoutBtn')) {
+                document.getElementById('logoutBtn').addEventListener('click', signOut);
+            }
+
+            if (document.getElementById('headerLogoutBtn')) {
+                document.getElementById('headerLogoutBtn').addEventListener('click', signOut);
+            }
+
+            // Login modal close
+            loginModal.addEventListener('click', (e) => {
+                if (e.target === loginModal && !currentUser) {
+                    // Don't allow closing if not logged in
+                    e.preventDefault();
+                }
+            });
 
             // Modal buttons
             document.getElementById('cancelBtn').addEventListener('click', closeModal);
@@ -1213,6 +1463,12 @@
         }
 
         function toggleEditMode() {
+            if (!isAuthenticated) {
+                showToast('🔐 Log in om de plattegrond aan te passen');
+                loginModal.classList.add('active');
+                return;
+            }
+            
             editMode = !editMode;
             editToggle.classList.toggle('active', editMode);
             plattegrondArea.classList.toggle('edit-mode', editMode);
@@ -1232,7 +1488,13 @@
         }
 
         function startDrag(e) {
-            if (!editMode) return;
+            if (!editMode || !isAuthenticated) {
+                if (!isAuthenticated) {
+                    showToast('🔐 Log in om de plattegrond aan te passen');
+                    loginModal.classList.add('active');
+                }
+                return;
+            }
             
             e.preventDefault();
             const trap = e.target.closest('.muizenval');
@@ -1360,6 +1622,12 @@
         }
 
         function deleteCatch(id) {
+            if (!isAuthenticated) {
+                showToast('🔐 Log in om vangsten te verwijderen');
+                loginModal.classList.add('active');
+                return;
+            }
+            
             if (!confirm('Weet je zeker dat je deze vangst wilt verwijderen?')) return;
             
             catches = catches.filter(c => c.id !== id);
@@ -1449,7 +1717,7 @@
                         </div>
                         <div class="vangst-actions">
                             ${c.photo ? `<button class="btn-view" onclick="viewPhoto('${c.photo}')">👁</button>` : ''}
-                            <button class="btn-delete" onclick="deleteCatch(${c.id})">🗑</button>
+                            ${isAuthenticated ? `<button class="btn-delete" onclick="deleteCatch(${c.id})">🗑</button>` : ''}
                         </div>
                     </div>
                 `;
