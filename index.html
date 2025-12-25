@@ -9,17 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #FF6B6B;
-            --primary-light: #FFE3E3;
-            --secondary: #4ECDC4;
-            --accent: #FFE66D;
-            --background: #FAFAFA;
-            --card-bg: #FFFFFF;
-            --text: #2D3436;
-            --text-light: #636E72;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
-            --edit-mode: #9B59B6;
+            /* Muizenjacht thema kleuren */
+            --primary: #C97D60; /* Warme bruin/oranje - vangst kleur */
+            --primary-light: #E8C4B0;
+            --primary-dark: #8B5A3C;
+            --secondary: #5D7C47; /* Donkergroen - jacht/natuur */
+            --secondary-light: #7FA063;
+            --accent: #F4A460; /* Zandkleur - camouflage */
+            --accent-dark: #D2691E;
+            --background: #2C2416; /* Donkere achtergrond - nachtjacht */
+            --background-light: #3D3424;
+            --card-bg: #F5E6D3; /* Crème/beige - natuurlijk */
+            --card-dark: #E8D5C0;
+            --text: #2C2416;
+            --text-light: #5D4E37;
+            --text-inverse: #F5E6D3;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --edit-mode: #8B4513; /* Saddle brown */
+            --success: #5D7C47;
+            --danger: #8B3A3A;
         }
 
         * {
@@ -30,32 +39,39 @@
 
         body {
             font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 50%, #FFECD2 100%);
+            background: linear-gradient(135deg, var(--background) 0%, var(--background-light) 50%, var(--background) 100%);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(93, 124, 71, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(201, 125, 96, 0.1) 0%, transparent 50%);
             min-height: 100vh;
             color: var(--text);
             padding-bottom: 100px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         /* Header */
         .header {
-            background: var(--card-bg);
+            background: linear-gradient(135deg, var(--card-bg), var(--card-dark));
             padding: 1.5rem;
             text-align: center;
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 3px solid var(--secondary);
         }
 
         .header h1 {
             font-family: 'Fredoka', sans-serif;
             font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--primary);
+            font-weight: 700;
+            color: var(--primary-dark);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header .subtitle {
@@ -68,14 +84,15 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: linear-gradient(135deg, var(--secondary), #45B7AA);
-            color: white;
-            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            color: var(--text-inverse);
+            padding: 0.75rem 1.25rem;
             border-radius: 50px;
             font-weight: 700;
             font-size: 1.1rem;
             margin-top: 0.75rem;
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+            box-shadow: 0 4px 15px rgba(93, 124, 71, 0.5);
+            border: 2px solid var(--secondary-light);
         }
 
         /* Tabs */
@@ -95,45 +112,61 @@
             font-family: 'Fredoka', sans-serif;
             font-size: 0.9rem;
             font-weight: 500;
-            padding: 0.6rem 1rem;
+            padding: 0.75rem 1.25rem;
+            min-height: 44px; /* Touch-friendly */
+            min-width: 44px;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             background: var(--card-bg);
             color: var(--text-light);
             box-shadow: var(--shadow);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
         }
 
         .tab-btn.active {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-inverse);
             transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(201, 125, 96, 0.4);
         }
 
-        .tab-btn:hover:not(.active) {
+        .tab-btn:hover:not(.active), .tab-btn:active:not(.active) {
             background: var(--primary-light);
-            color: var(--primary);
+            color: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        /* Touch feedback */
+        .tab-btn:active {
+            transform: scale(0.98);
         }
 
         .tab-btn.login-btn {
             margin-left: auto;
-            background: linear-gradient(135deg, var(--secondary), #45B7AA);
-            color: white;
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            color: var(--text-inverse);
+            box-shadow: 0 4px 15px rgba(93, 124, 71, 0.4);
         }
 
-        .tab-btn.login-btn:hover {
-            background: linear-gradient(135deg, #45B7AA, var(--secondary));
+        .tab-btn.login-btn:hover, .tab-btn.login-btn:active {
+            background: linear-gradient(135deg, var(--secondary-light), var(--secondary));
             transform: scale(1.05);
         }
 
-        .tab-btn.login-btn.logged-in {
-            background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+        .tab-btn.login-btn:active {
+            transform: scale(0.98);
         }
 
-        .tab-btn.login-btn.logged-in:hover {
-            background: linear-gradient(135deg, #7F8C8D, #95A5A6);
+        .tab-btn.login-btn.logged-in {
+            background: linear-gradient(135deg, #8B7355, #6B5D47);
+        }
+
+        .tab-btn.login-btn.logged-in:hover, .tab-btn.login-btn.logged-in:active {
+            background: linear-gradient(135deg, #6B5D47, #8B7355);
         }
 
         /* Content sections */
@@ -184,20 +217,29 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.25rem;
+            min-height: 44px;
             border: 2px solid var(--edit-mode);
             border-radius: 50px;
             background: transparent;
             color: var(--edit-mode);
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .edit-toggle:hover, .edit-toggle.active {
             background: var(--edit-mode);
-            color: white;
+            color: var(--text-inverse);
+            transform: scale(1.05);
+        }
+
+        .edit-toggle:active {
+            transform: scale(0.98);
         }
 
         .edit-toggle.active {
@@ -205,24 +247,29 @@
         }
 
         @keyframes editPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(155, 89, 182, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 69, 19, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(139, 69, 19, 0); }
         }
 
         .plattegrond {
             position: relative;
             width: 100%;
             aspect-ratio: 0.65;
-            background: linear-gradient(180deg, #F8F9FA 0%, #E9ECEF 100%);
+            background: linear-gradient(180deg, var(--card-bg) 0%, var(--card-dark) 100%);
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(93, 124, 71, 0.03) 10px, rgba(93, 124, 71, 0.03) 20px),
+                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(201, 125, 96, 0.03) 10px, rgba(201, 125, 96, 0.03) 20px);
             border: 3px solid var(--text);
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             touch-action: none;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .plattegrond.edit-mode {
             border-color: var(--edit-mode);
-            background: linear-gradient(180deg, #F5EEF8 0%, #E8DAEF 100%);
+            background: linear-gradient(180deg, #E8D5C0 0%, #D4C0A8 100%);
+            box-shadow: inset 0 2px 10px rgba(139, 69, 19, 0.2), 0 0 0 3px rgba(139, 69, 19, 0.3);
         }
 
         /* Muren en structuur */
@@ -250,10 +297,10 @@
             top: 35%;
             background: repeating-linear-gradient(
                 45deg,
-                #DDD,
-                #DDD 4px,
-                #BBB 4px,
-                #BBB 8px
+                var(--card-dark),
+                var(--card-dark) 4px,
+                var(--text-light) 4px,
+                var(--text-light) 8px
             );
             border: 2px solid var(--text);
             border-radius: 4px;
@@ -266,49 +313,56 @@
             left: 35%;
             width: 30%;
             height: 20px;
-            background: var(--card-bg);
+            background: var(--card-dark);
             border: 3px solid var(--text);
             border-bottom: none;
             border-radius: 0 0 8px 8px;
             pointer-events: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
         /* Muizenval buttons */
         .muizenval {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
             border-radius: 50%;
             border: 3px solid var(--text);
-            background: var(--card-bg);
+            background: linear-gradient(135deg, var(--card-bg), var(--card-dark));
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Fredoka', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: 700;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.3);
             transform: translate(-50%, -50%);
             z-index: 10;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .muizenval:hover {
-            transform: translate(-50%, -50%) scale(1.2);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
         .muizenval:active {
-            transform: translate(-50%, -50%) scale(0.95);
+            transform: translate(-50%, -50%) scale(0.92);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .muizenval.has-catch {
-            background: linear-gradient(135deg, var(--primary), #E55555);
-            color: white;
-            border-color: #C0392B;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-inverse);
+            border-color: var(--primary-dark);
+            box-shadow: 0 4px 15px rgba(201, 125, 96, 0.5), inset 0 2px 4px rgba(255,255,255,0.2);
             animation: pulse 2s infinite;
         }
 
@@ -336,25 +390,32 @@
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4); }
-            50% { box-shadow: 0 3px 20px rgba(255, 107, 107, 0.8); }
+            0%, 100% { 
+                box-shadow: 0 4px 15px rgba(201, 125, 96, 0.5), inset 0 2px 4px rgba(255,255,255,0.2);
+            }
+            50% { 
+                box-shadow: 0 6px 25px rgba(201, 125, 96, 0.8), inset 0 2px 4px rgba(255,255,255,0.3);
+            }
         }
 
         .muizenval .catch-count {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--accent);
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
             color: var(--text);
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            min-height: 24px;
             border-radius: 50%;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid white;
+            border: 2px solid var(--card-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         /* Instructie */
@@ -364,12 +425,13 @@
             font-size: 0.9rem;
             margin-top: 1rem;
             padding: 1rem;
-            background: rgba(255,255,255,0.5);
+            background: rgba(245, 230, 211, 0.8);
             border-radius: 12px;
+            border: 1px solid rgba(93, 124, 71, 0.2);
         }
 
         .instruction.edit-mode {
-            background: rgba(155, 89, 182, 0.1);
+            background: rgba(139, 69, 19, 0.15);
             color: var(--edit-mode);
             border: 2px dashed var(--edit-mode);
         }
@@ -416,11 +478,12 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, var(--primary), #E55555);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-inverse);
             padding: 1.5rem;
             text-align: center;
             border-radius: 24px 24px 0 0;
+            box-shadow: 0 4px 15px rgba(201, 125, 96, 0.3);
         }
 
         .modal-header h2 {
@@ -451,39 +514,53 @@
 
         .form-group input {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #E9ECEF;
+            padding: 0.9rem 1.1rem;
+            min-height: 48px;
+            border: 2px solid var(--text-light);
             border-radius: 12px;
             font-size: 1rem;
             font-family: inherit;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.2s ease;
+            background: var(--card-bg);
+            color: var(--text);
+            -webkit-tap-highlight-color: transparent;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(93, 124, 71, 0.1);
         }
 
         /* Photo upload */
         .photo-upload {
-            border: 3px dashed #DDD;
+            border: 3px dashed var(--text-light);
             border-radius: 16px;
             padding: 2rem;
+            min-height: 120px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: #FAFAFA;
+            transition: all 0.2s ease;
+            background: var(--card-dark);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-        .photo-upload:hover {
+        .photo-upload:hover, .photo-upload:active {
             border-color: var(--secondary);
-            background: rgba(78, 205, 196, 0.05);
+            background: rgba(93, 124, 71, 0.1);
+            transform: scale(1.02);
+        }
+
+        .photo-upload:active {
+            transform: scale(0.98);
         }
 
         .photo-upload.has-photo {
             padding: 0.5rem;
             border-style: solid;
             border-color: var(--secondary);
+            border-width: 3px;
         }
 
         .photo-upload input {
@@ -516,34 +593,44 @@
 
         .btn {
             flex: 1;
-            padding: 1rem;
+            padding: 1rem 1.25rem;
+            min-height: 48px;
             border: none;
             border-radius: 12px;
             font-family: 'Fredoka', sans-serif;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), #45B7AA);
-            color: white;
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            color: var(--text-inverse);
+            box-shadow: 0 4px 15px rgba(93, 124, 71, 0.4);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover, .btn-primary:active {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
+            box-shadow: 0 6px 20px rgba(93, 124, 71, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
-            background: #F1F3F4;
-            color: var(--text-light);
+            background: var(--card-dark);
+            color: var(--text);
+            border: 2px solid var(--text-light);
         }
 
-        .btn-secondary:hover {
-            background: #E9ECEF;
+        .btn-secondary:hover, .btn-secondary:active {
+            background: var(--text-light);
+            color: var(--card-bg);
         }
 
         /* Vangsten lijst */
@@ -598,14 +685,15 @@
 
         .vangst-info .trap-badge {
             display: inline-block;
-            background: linear-gradient(135deg, var(--primary), #E55555);
-            color: white;
-            padding: 0.25rem 0.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-inverse);
+            padding: 0.35rem 0.85rem;
             border-radius: 50px;
             font-family: 'Fredoka', sans-serif;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 0.5rem;
+            box-shadow: 0 2px 8px rgba(201, 125, 96, 0.3);
         }
 
         .vangst-info .datetime {
@@ -626,33 +714,50 @@
         }
 
         .vangst-actions button {
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-delete {
-            background: #FFE3E3;
-            color: var(--primary);
+            background: rgba(139, 58, 58, 0.2);
+            color: var(--danger);
         }
 
-        .btn-delete:hover {
-            background: var(--primary);
-            color: white;
+        .btn-delete:hover, .btn-delete:active {
+            background: var(--danger);
+            color: var(--text-inverse);
+            transform: scale(1.1);
+        }
+
+        .btn-delete:active {
+            transform: scale(0.95);
         }
 
         .btn-view {
-            background: #E3F9F7;
+            background: rgba(93, 124, 71, 0.2);
             color: var(--secondary);
         }
 
-        .btn-view:hover {
+        .btn-view:hover, .btn-view:active {
             background: var(--secondary);
-            color: white;
+            color: var(--text-inverse);
+            transform: scale(1.1);
+        }
+
+        .btn-view:active {
+            transform: scale(0.95);
         }
 
         .empty-state {
@@ -704,19 +809,31 @@
             position: absolute;
             top: 1rem;
             right: 1rem;
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+            min-height: 56px;
             border-radius: 50%;
             border: none;
             background: rgba(255,255,255,0.2);
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .photo-viewer .close-btn:hover {
+        .photo-viewer .close-btn:hover, .photo-viewer .close-btn:active {
             background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .photo-viewer .close-btn:active {
+            transform: scale(0.95);
         }
 
         /* Statistieken */
@@ -778,15 +895,18 @@
         }
 
         .trap-rank .rank {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            min-height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), #FFD93D);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .trap-rank .trap-name {
@@ -800,25 +920,95 @@
             font-family: 'Fredoka', sans-serif;
         }
 
-        /* Responsive */
-        @media (max-width: 400px) {
+        /* Responsive - Touch optimizations */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .tabs {
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .tab-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.85rem;
+            }
+
             .muizenval {
-                width: 32px;
-                height: 32px;
-                font-size: 0.7rem;
+                width: 52px;
+                height: 52px;
+                min-width: 52px;
+                min-height: 52px;
+                font-size: 1.1rem;
             }
 
             .muizenval .catch-count {
-                width: 18px;
-                height: 18px;
-                font-size: 0.6rem;
+                width: 26px;
+                height: 26px;
+                min-width: 26px;
+                min-height: 26px;
+                font-size: 0.8rem;
+                top: -4px;
+                right: -4px;
+            }
+
+            .btn {
+                padding: 1.1rem 1.25rem;
+                min-height: 52px;
+                font-size: 1.05rem;
+            }
+
+            .edit-toggle {
+                padding: 0.85rem 1.15rem;
+                min-height: 48px;
+            }
+
+            .vangst-actions button {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .muizenval {
+                width: 48px;
+                height: 48px;
+                min-width: 48px;
+                min-height: 48px;
+                font-size: 1rem;
+            }
+
+            .muizenval .catch-count {
+                width: 24px;
+                height: 24px;
+                min-width: 24px;
+                min-height: 24px;
+                font-size: 0.75rem;
                 top: -6px;
                 right: -6px;
             }
 
             .plattegrond.edit-mode .muizenval::after {
-                font-size: 0.6rem;
-                top: -16px;
+                font-size: 0.7rem;
+                top: -18px;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn.login-btn {
+                margin-left: 0;
+                width: 100%;
+                margin-top: 0.5rem;
             }
         }
 
@@ -999,9 +1189,9 @@
     <!-- Login Modal -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal" style="max-width: 350px;">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--secondary), #45B7AA);">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--secondary), var(--secondary-light));">
                 <h2>🔐 Inloggen</h2>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9;">Alleen bekijken? Klik op "Bekijken zonder inloggen"</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.95;">Alleen bekijken? Klik op "Bekijken zonder inloggen"</p>
             </div>
             <div class="modal-content">
                 <div id="loginForm">
@@ -1105,6 +1295,7 @@
         let draggingTrap = null;
         let dataLoaded = false;
         let viewOnlyMode = false;
+        let preventScroll = false;
 
         // DOM Elements
         const totalScoreEl = document.getElementById('totalScore');
@@ -1522,6 +1713,14 @@
             document.addEventListener('touchmove', drag, { passive: false });
             document.addEventListener('mouseup', endDrag);
             document.addEventListener('touchend', endDrag);
+            document.addEventListener('touchcancel', endDrag);
+            
+            // Prevent body scroll during drag on mobile
+            document.addEventListener('touchmove', (e) => {
+                if (preventScroll && draggingTrap) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
         }
 
         function toggleEditMode() {
@@ -1559,11 +1758,16 @@
             }
             
             e.preventDefault();
+            e.stopPropagation();
             const trap = e.target.closest('.muizenval');
             if (!trap) return;
 
             draggingTrap = trap;
             trap.classList.add('dragging');
+            
+            // Prevent body scroll on mobile during drag
+            preventScroll = true;
+            document.body.style.overflow = 'hidden';
         }
 
         function drag(e) {
@@ -1606,6 +1810,10 @@
 
             draggingTrap.classList.remove('dragging');
             draggingTrap = null;
+
+            // Re-enable body scroll
+            preventScroll = false;
+            document.body.style.overflow = '';
 
             showToast('Positie opgeslagen!');
         }
