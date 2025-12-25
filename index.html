@@ -82,6 +82,7 @@
         .tabs {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 0.5rem;
             padding: 1rem;
             position: sticky;
@@ -113,6 +114,26 @@
         .tab-btn:hover:not(.active) {
             background: var(--primary-light);
             color: var(--primary);
+        }
+
+        .tab-btn.login-btn {
+            margin-left: auto;
+            background: linear-gradient(135deg, var(--secondary), #45B7AA);
+            color: white;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .tab-btn.login-btn:hover {
+            background: linear-gradient(135deg, #45B7AA, var(--secondary));
+            transform: scale(1.05);
+        }
+
+        .tab-btn.login-btn.logged-in {
+            background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+        }
+
+        .tab-btn.login-btn.logged-in:hover {
+            background: linear-gradient(135deg, #7F8C8D, #95A5A6);
         }
 
         /* Content sections */
@@ -854,6 +875,9 @@
         <button class="tab-btn active" data-tab="plattegrond">📍 Plattegrond</button>
         <button class="tab-btn" data-tab="vangsten">📋 Vangsten</button>
         <button class="tab-btn" data-tab="stats">📊 Stats</button>
+        <button class="tab-btn login-btn" id="headerLoginBtn">
+            <span id="loginBtnText">🔐 Login</span>
+        </button>
     </div>
 
     <!-- Content -->
@@ -1246,6 +1270,25 @@
                 }
             }
 
+            // Update login button in tabs
+            const headerLoginBtn = document.getElementById('headerLoginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            if (headerLoginBtn && loginBtnText) {
+                if (isAuthenticated) {
+                    headerLoginBtn.classList.add('logged-in');
+                    loginBtnText.textContent = '🚪 Uitloggen';
+                    headerLoginBtn.title = 'Klik om uit te loggen';
+                } else if (viewOnlyMode) {
+                    headerLoginBtn.classList.add('logged-in');
+                    loginBtnText.textContent = '👁️ Bekijkmodus';
+                    headerLoginBtn.title = 'Klik om uit te loggen en in te loggen';
+                } else {
+                    headerLoginBtn.classList.remove('logged-in');
+                    loginBtnText.textContent = '🔐 Login';
+                    headerLoginBtn.title = 'Klik om in te loggen';
+                }
+            }
+
             // Hide/show edit button
             if (editToggle) {
                 if (isAuthenticated) {
@@ -1382,13 +1425,32 @@
         function setupEventListeners() {
             // Tab navigation
             document.querySelectorAll('.tab-btn').forEach(btn => {
+                // Skip login button for tab navigation
+                if (btn.id === 'headerLoginBtn') return;
+                
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        if (b.id !== 'headerLoginBtn') b.classList.remove('active');
+                    });
                     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
                     btn.classList.add('active');
                     document.getElementById(btn.dataset.tab).classList.add('active');
                 });
             });
+
+            // Login button in header
+            const headerLoginBtn = document.getElementById('headerLoginBtn');
+            if (headerLoginBtn) {
+                headerLoginBtn.addEventListener('click', () => {
+                    if (isAuthenticated || viewOnlyMode) {
+                        // User is logged in, show logout option
+                        signOut();
+                    } else {
+                        // User is not logged in, show login modal
+                        loginModal.classList.add('active');
+                    }
+                });
+            }
 
             // Edit toggle
             if (editToggle) {
