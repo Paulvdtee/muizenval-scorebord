@@ -4,31 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>🐭 Muizenjacht</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Muizenjacht thema kleuren */
-            --primary: #C97D60; /* Warme bruin/oranje - vangst kleur */
-            --primary-light: #E8C4B0;
-            --primary-dark: #8B5A3C;
-            --secondary: #5D7C47; /* Donkergroen - jacht/natuur */
-            --secondary-light: #7FA063;
-            --accent: #F4A460; /* Zandkleur - camouflage */
-            --accent-dark: #D2691E;
-            --background: #2C2416; /* Donkere achtergrond - nachtjacht */
-            --background-light: #3D3424;
-            --card-bg: #F5E6D3; /* Crème/beige - natuurlijk */
-            --card-dark: #E8D5C0;
-            --text: #2C2416;
-            --text-light: #5D4E37;
-            --text-inverse: #F5E6D3;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
-            --edit-mode: #8B4513; /* Saddle brown */
-            --success: #5D7C47;
-            --danger: #8B3A3A;
+            --primary: #FF6B6B;
+            --primary-light: #FFE3E3;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --background: #FAFAFA;
+            --card-bg: #FFFFFF;
+            --text: #2D3436;
+            --text-light: #636E72;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --edit-mode: #9B59B6;
         }
 
         * {
@@ -39,39 +33,32 @@
 
         body {
             font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, var(--background) 0%, var(--background-light) 50%, var(--background) 100%);
-            background-image: 
-                radial-gradient(circle at 20% 50%, rgba(93, 124, 71, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(201, 125, 96, 0.1) 0%, transparent 50%);
+            background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 50%, #FFECD2 100%);
             min-height: 100vh;
             color: var(--text);
             padding-bottom: 100px;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, var(--card-bg), var(--card-dark));
+            background: var(--card-bg);
             padding: 1.5rem;
             text-align: center;
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 3px solid var(--secondary);
         }
 
         .header h1 {
             font-family: 'Fredoka', sans-serif;
             font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-dark);
+            font-weight: 600;
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header .subtitle {
@@ -84,22 +71,20 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
-            color: var(--text-inverse);
-            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, var(--secondary), #45B7AA);
+            color: white;
+            padding: 0.5rem 1rem;
             border-radius: 50px;
             font-weight: 700;
             font-size: 1.1rem;
             margin-top: 0.75rem;
-            box-shadow: 0 4px 15px rgba(93, 124, 71, 0.5);
-            border: 2px solid var(--secondary-light);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
         }
 
         /* Tabs */
         .tabs {
             display: flex;
             justify-content: center;
-            align-items: center;
             gap: 0.5rem;
             padding: 1rem;
             position: sticky;
@@ -112,61 +97,25 @@
             font-family: 'Fredoka', sans-serif;
             font-size: 0.9rem;
             font-weight: 500;
-            padding: 0.75rem 1.25rem;
-            min-height: 44px; /* Touch-friendly */
-            min-width: 44px;
+            padding: 0.6rem 1rem;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             background: var(--card-bg);
             color: var(--text-light);
             box-shadow: var(--shadow);
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            user-select: none;
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--text-inverse);
+            background: var(--primary);
+            color: white;
             transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(201, 125, 96, 0.4);
         }
 
-        .tab-btn:hover:not(.active), .tab-btn:active:not(.active) {
+        .tab-btn:hover:not(.active) {
             background: var(--primary-light);
-            color: var(--primary-dark);
-            transform: scale(1.02);
-        }
-
-        /* Touch feedback */
-        .tab-btn:active {
-            transform: scale(0.98);
-        }
-
-        .tab-btn.login-btn {
-            margin-left: auto;
-            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
-            color: var(--text-inverse);
-            box-shadow: 0 4px 15px rgba(93, 124, 71, 0.4);
-        }
-
-        .tab-btn.login-btn:hover, .tab-btn.login-btn:active {
-            background: linear-gradient(135deg, var(--secondary-light), var(--secondary));
-            transform: scale(1.05);
-        }
-
-        .tab-btn.login-btn:active {
-            transform: scale(0.98);
-        }
-
-        .tab-btn.login-btn.logged-in {
-            background: linear-gradient(135deg, #8B7355, #6B5D47);
-        }
-
-        .tab-btn.login-btn.logged-in:hover, .tab-btn.login-btn.logged-in:active {
-            background: linear-gradient(135deg, #6B5D47, #8B7355);
+            color: var(--primary);
         }
 
         /* Content sections */
@@ -188,6 +137,95 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Welkomstbanner */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255,255,255,0.95) 100%);
+            border-radius: 20px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--secondary);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .welcome-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.75rem;
+        }
+
+        .welcome-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            animation: bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .welcome-text h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .welcome-text p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0 0 0.5rem 0;
+            line-height: 1.4;
+        }
+
+        .welcome-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .welcome-cta {
+            background: linear-gradient(135deg, rgba(93, 203, 190, 0.15), rgba(93, 203, 190, 0.05));
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.85rem !important;
+            color: var(--secondary-dark) !important;
+        }
+
+        .welcome-text strong {
+            color: var(--primary-dark);
+        }
+
+        .welcome-link {
+            color: var(--secondary-dark);
+            font-weight: 700;
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 2px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .welcome-link:hover {
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 480px) {
+            .welcome-banner {
+                padding: 1rem;
+            }
+
+            .welcome-icon {
+                font-size: 2rem;
+            }
+
+            .welcome-text h2 {
+                font-size: 1rem;
+            }
         }
 
         /* Plattegrond */
@@ -217,29 +255,20 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            min-height: 44px;
+            padding: 0.5rem 1rem;
             border: 2px solid var(--edit-mode);
             border-radius: 50px;
             background: transparent;
             color: var(--edit-mode);
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            transition: all 0.3s ease;
         }
 
         .edit-toggle:hover, .edit-toggle.active {
             background: var(--edit-mode);
-            color: var(--text-inverse);
-            transform: scale(1.05);
-        }
-
-        .edit-toggle:active {
-            transform: scale(0.98);
+            color: white;
         }
 
         .edit-toggle.active {
@@ -247,29 +276,24 @@
         }
 
         @keyframes editPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 69, 19, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(139, 69, 19, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(155, 89, 182, 0); }
         }
 
         .plattegrond {
             position: relative;
             width: 100%;
             aspect-ratio: 0.65;
-            background: linear-gradient(180deg, var(--card-bg) 0%, var(--card-dark) 100%);
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(93, 124, 71, 0.03) 10px, rgba(93, 124, 71, 0.03) 20px),
-                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(201, 125, 96, 0.03) 10px, rgba(201, 125, 96, 0.03) 20px);
+            background: linear-gradient(180deg, #F8F9FA 0%, #E9ECEF 100%);
             border: 3px solid var(--text);
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
             touch-action: none;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .plattegrond.edit-mode {
             border-color: var(--edit-mode);
-            background: linear-gradient(180deg, #E8D5C0 0%, #D4C0A8 100%);
-            box-shadow: inset 0 2px 10px rgba(139, 69, 19, 0.2), 0 0 0 3px rgba(139, 69, 19, 0.3);
+            background: linear-gradient(180deg, #F5EEF8 0%, #E8DAEF 100%);
         }
 
         /* Muren en structuur */
@@ -297,10 +321,10 @@
             top: 35%;
             background: repeating-linear-gradient(
                 45deg,
-                var(--card-dark),
-                var(--card-dark) 4px,
-                var(--text-light) 4px,
-                var(--text-light) 8px
+                #DDD,
+                #DDD 4px,
+                #BBB 4px,
+                #BBB 8px
             );
             border: 2px solid var(--text);
             border-radius: 4px;
@@ -313,56 +337,49 @@
             left: 35%;
             width: 30%;
             height: 20px;
-            background: var(--card-dark);
+            background: var(--card-bg);
             border: 3px solid var(--text);
             border-bottom: none;
             border-radius: 0 0 8px 8px;
             pointer-events: none;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
         /* Muizenval buttons */
         .muizenval {
             position: absolute;
-            width: 48px;
-            height: 48px;
-            min-width: 48px;
-            min-height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 3px solid var(--text);
-            background: linear-gradient(135deg, var(--card-bg), var(--card-dark));
+            background: var(--card-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Fredoka', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             transform: translate(-50%, -50%);
             z-index: 10;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
 
         .muizenval:hover {
-            transform: translate(-50%, -50%) scale(1.15);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
 
         .muizenval:active {
-            transform: translate(-50%, -50%) scale(0.92);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transform: translate(-50%, -50%) scale(0.95);
         }
 
         .muizenval.has-catch {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--text-inverse);
-            border-color: var(--primary-dark);
-            box-shadow: 0 4px 15px rgba(201, 125, 96, 0.5), inset 0 2px 4px rgba(255,255,255,0.2);
+            background: linear-gradient(135deg, var(--primary), #E55555);
+            color: white;
+            border-color: #C0392B;
             animation: pulse 2s infinite;
         }
 
@@ -390,54 +407,25 @@
         }
 
         @keyframes pulse {
-            0%, 100% { 
-                box-shadow: 0 4px 15px rgba(201, 125, 96, 0.5), inset 0 2px 4px rgba(255,255,255,0.2);
-            }
-            50% { 
-                box-shadow: 0 6px 25px rgba(201, 125, 96, 0.8), inset 0 2px 4px rgba(255,255,255,0.3);
-            }
+            0%, 100% { box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4); }
+            50% { box-shadow: 0 3px 20px rgba(255, 107, 107, 0.8); }
         }
 
         .muizenval .catch-count {
             position: absolute;
-            top: -6px;
-            right: -6px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
             color: var(--text);
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            min-height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--card-bg);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        /* Instructie */
-        .instruction {
-            text-align: center;
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            padding: 1rem;
-            background: rgba(245, 230, 211, 0.8);
-            border-radius: 12px;
-            border: 1px solid rgba(93, 124, 71, 0.2);
-        }
-
-        .instruction.edit-mode {
-            background: rgba(139, 69, 19, 0.15);
-            color: var(--edit-mode);
-            border: 2px dashed var(--edit-mode);
-        }
-
-        .instruction span {
-            font-size: 1.5rem;
+            border: 2px solid white;
         }
 
         /* Modal */
@@ -478,12 +466,11 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--text-inverse);
+            background: linear-gradient(135deg, var(--primary), #E55555);
+            color: white;
             padding: 1.5rem;
             text-align: center;
             border-radius: 24px 24px 0 0;
-            box-shadow: 0 4px 15px rgba(201, 125, 96, 0.3);
         }
 
         .modal-header h2 {
@@ -514,53 +501,39 @@
 
         .form-group input {
             width: 100%;
-            padding: 0.9rem 1.1rem;
-            min-height: 48px;
-            border: 2px solid var(--text-light);
+            padding: 0.75rem 1rem;
+            border: 2px solid #E9ECEF;
             border-radius: 12px;
             font-size: 1rem;
             font-family: inherit;
-            transition: border-color 0.2s ease;
-            background: var(--card-bg);
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent;
+            transition: border-color 0.3s ease;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(93, 124, 71, 0.1);
         }
 
         /* Photo upload */
         .photo-upload {
-            border: 3px dashed var(--text-light);
+            border: 3px dashed #DDD;
             border-radius: 16px;
             padding: 2rem;
-            min-height: 120px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
-            background: var(--card-dark);
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            transition: all 0.3s ease;
+            background: #FAFAFA;
         }
 
-        .photo-upload:hover, .photo-upload:active {
+        .photo-upload:hover {
             border-color: var(--secondary);
-            background: rgba(93, 124, 71, 0.1);
-            transform: scale(1.02);
-        }
-
-        .photo-upload:active {
-            transform: scale(0.98);
+            background: rgba(78, 205, 196, 0.05);
         }
 
         .photo-upload.has-photo {
             padding: 0.5rem;
             border-style: solid;
             border-color: var(--secondary);
-            border-width: 3px;
         }
 
         .photo-upload input {
@@ -593,44 +566,34 @@
 
         .btn {
             flex: 1;
-            padding: 1rem 1.25rem;
-            min-height: 48px;
+            padding: 1rem;
             border: none;
             border-radius: 12px;
             font-family: 'Fredoka', sans-serif;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            user-select: none;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
-            color: var(--text-inverse);
-            box-shadow: 0 4px 15px rgba(93, 124, 71, 0.4);
+            background: linear-gradient(135deg, var(--secondary), #45B7AA);
+            color: white;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
         }
 
-        .btn-primary:hover, .btn-primary:active {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(93, 124, 71, 0.5);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
         }
 
         .btn-secondary {
-            background: var(--card-dark);
-            color: var(--text);
-            border: 2px solid var(--text-light);
+            background: #F1F3F4;
+            color: var(--text-light);
         }
 
-        .btn-secondary:hover, .btn-secondary:active {
-            background: var(--text-light);
-            color: var(--card-bg);
+        .btn-secondary:hover {
+            background: #E9ECEF;
         }
 
         /* Vangsten lijst */
@@ -685,15 +648,14 @@
 
         .vangst-info .trap-badge {
             display: inline-block;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--text-inverse);
-            padding: 0.35rem 0.85rem;
+            background: linear-gradient(135deg, var(--primary), #E55555);
+            color: white;
+            padding: 0.25rem 0.75rem;
             border-radius: 50px;
             font-family: 'Fredoka', sans-serif;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 500;
             margin-bottom: 0.5rem;
-            box-shadow: 0 2px 8px rgba(201, 125, 96, 0.3);
         }
 
         .vangst-info .datetime {
@@ -714,50 +676,33 @@
         }
 
         .vangst-actions button {
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
-            min-height: 44px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         .btn-delete {
-            background: rgba(139, 58, 58, 0.2);
-            color: var(--danger);
+            background: #FFE3E3;
+            color: var(--primary);
         }
 
-        .btn-delete:hover, .btn-delete:active {
-            background: var(--danger);
-            color: var(--text-inverse);
-            transform: scale(1.1);
-        }
-
-        .btn-delete:active {
-            transform: scale(0.95);
+        .btn-delete:hover {
+            background: var(--primary);
+            color: white;
         }
 
         .btn-view {
-            background: rgba(93, 124, 71, 0.2);
+            background: #E3F9F7;
             color: var(--secondary);
         }
 
-        .btn-view:hover, .btn-view:active {
+        .btn-view:hover {
             background: var(--secondary);
-            color: var(--text-inverse);
-            transform: scale(1.1);
-        }
-
-        .btn-view:active {
-            transform: scale(0.95);
+            color: white;
         }
 
         .empty-state {
@@ -809,31 +754,19 @@
             position: absolute;
             top: 1rem;
             right: 1rem;
-            width: 56px;
-            height: 56px;
-            min-width: 56px;
-            min-height: 56px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             border: none;
             background: rgba(255,255,255,0.2);
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: background 0.3s ease;
         }
 
-        .photo-viewer .close-btn:hover, .photo-viewer .close-btn:active {
+        .photo-viewer .close-btn:hover {
             background: rgba(255,255,255,0.3);
-            transform: scale(1.1);
-        }
-
-        .photo-viewer .close-btn:active {
-            transform: scale(0.95);
         }
 
         /* Statistieken */
@@ -895,18 +828,15 @@
         }
 
         .trap-rank .rank {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            min-height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background: linear-gradient(135deg, var(--accent), #FFD93D);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-size: 0.85rem;
         }
 
         .trap-rank .trap-name {
@@ -920,95 +850,290 @@
             font-family: 'Fredoka', sans-serif;
         }
 
-        /* Responsive - Touch optimizations */
+        /* Voorspelling Section */
+        .prediction-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .prediction-header h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .prediction-subtitle {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .prediction-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .prediction-card h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .prediction-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--card-dark);
+            border-radius: 12px;
+        }
+
+        .info-icon {
+            font-size: 1.5rem;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        #predictionLeaderboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+        }
+
+        #predictionLeaderboard::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #predictionLeaderboard::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        #predictionLeaderboard::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 4px;
+        }
+
+        .prediction-entry {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.6rem;
+            background: var(--card-dark);
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary);
+            transition: all 0.2s ease;
+        }
+
+        .prediction-entry:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow);
+        }
+
+        .prediction-entry.winner {
+            background: linear-gradient(135deg, rgba(244, 164, 96, 0.2), rgba(244, 164, 96, 0.1));
+            border-left-color: var(--accent);
+        }
+
+        .prediction-rank {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            min-height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .prediction-rank.gold {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+
+        .prediction-rank.silver {
+            background: linear-gradient(135deg, #C0C0C0, #808080);
+        }
+
+        .prediction-rank.bronze {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+        }
+
+        .prediction-rank.participant-number {
+            background: linear-gradient(135deg, var(--secondary), #45B7AA);
+            font-size: 0.7rem;
+        }
+
+        .prediction-entry.participant {
+            border-left-color: var(--secondary);
+        }
+
+        .prediction-details {
+            flex: 1;
+        }
+
+        .prediction-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .prediction-number {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .prediction-difference {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .prediction-difference.close {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .prediction-status {
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .prediction-status.success {
+            background: rgba(93, 124, 71, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .prediction-status.error {
+            background: rgba(139, 58, 58, 0.1);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .prediction-status.info {
+            background: rgba(201, 125, 96, 0.1);
+            color: var(--primary-dark);
+            border: 2px solid var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        /* Mobile optimizations for predictions */
         @media (max-width: 768px) {
-            .header {
-                padding: 1rem;
+            .prediction-info {
+                grid-template-columns: 1fr;
             }
 
-            .header h1 {
-                font-size: 1.5rem;
+            #predictionLeaderboard {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.4rem;
             }
 
-            .tabs {
-                padding: 0.75rem;
-                gap: 0.5rem;
+            .prediction-entry {
+                padding: 0.4rem 0.5rem;
             }
 
-            .tab-btn {
-                padding: 0.7rem 1rem;
+            .prediction-rank {
+                width: 24px;
+                height: 24px;
+                min-width: 24px;
+                min-height: 24px;
+                font-size: 0.65rem;
+            }
+
+            .prediction-name {
+                font-size: 0.8rem;
+            }
+
+            .prediction-number {
                 font-size: 0.85rem;
             }
 
-            .muizenval {
-                width: 52px;
-                height: 52px;
-                min-width: 52px;
-                min-height: 52px;
-                font-size: 1.1rem;
-            }
-
-            .muizenval .catch-count {
-                width: 26px;
-                height: 26px;
-                min-width: 26px;
-                min-height: 26px;
-                font-size: 0.8rem;
-                top: -4px;
-                right: -4px;
-            }
-
-            .btn {
-                padding: 1.1rem 1.25rem;
-                min-height: 52px;
-                font-size: 1.05rem;
-            }
-
-            .edit-toggle {
-                padding: 0.85rem 1.15rem;
-                min-height: 48px;
-            }
-
-            .vangst-actions button {
-                width: 44px;
-                height: 44px;
-                min-width: 44px;
-                min-height: 44px;
+            .form-group input[type="text"],
+            .form-group input[type="number"] {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 0.875rem;
             }
         }
 
         @media (max-width: 400px) {
             .muizenval {
-                width: 48px;
-                height: 48px;
-                min-width: 48px;
-                min-height: 48px;
-                font-size: 1rem;
+                width: 32px;
+                height: 32px;
+                font-size: 0.7rem;
             }
 
             .muizenval .catch-count {
-                width: 24px;
-                height: 24px;
-                min-width: 24px;
-                min-height: 24px;
-                font-size: 0.75rem;
+                width: 18px;
+                height: 18px;
+                font-size: 0.6rem;
                 top: -6px;
                 right: -6px;
             }
 
             .plattegrond.edit-mode .muizenval::after {
-                font-size: 0.7rem;
-                top: -18px;
-            }
-
-            .tabs {
-                flex-wrap: wrap;
-            }
-
-            .tab-btn.login-btn {
-                margin-left: 0;
-                width: 100%;
-                margin-top: 0.5rem;
+                font-size: 0.6rem;
+                top: -16px;
             }
         }
 
@@ -1047,16 +1172,10 @@
     <header class="header">
         <h1>🐭 Muizenjacht</h1>
         <p class="subtitle">Gotta catch 'em all</p>
-        <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 0.5rem;">
-            <div class="score-badge">
-                <span>🏆</span>
-                <span id="totalScore">0</span>
-                <span>muizen gevangen</span>
-            </div>
-            <div id="userBadge" style="display: none; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.85rem;">
-                <span id="userEmailBadge"></span>
-                <button id="headerLogoutBtn" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1rem;" title="Uitloggen">🚪</button>
-            </div>
+        <div class="score-badge">
+            <span>🏆</span>
+            <span id="totalScore">0</span>
+            <span>muizen gevangen</span>
         </div>
     </header>
 
@@ -1065,22 +1184,28 @@
         <button class="tab-btn active" data-tab="plattegrond">📍 Plattegrond</button>
         <button class="tab-btn" data-tab="vangsten">📋 Vangsten</button>
         <button class="tab-btn" data-tab="stats">📊 Stats</button>
-        <button class="tab-btn login-btn" id="headerLoginBtn">
-            <span id="loginBtnText">🔐 Login</span>
-        </button>
+        <button class="tab-btn" data-tab="voorspelling">🎯 Voorspelling</button>
     </div>
 
     <!-- Content -->
     <div class="content">
+        <!-- Welkomstbanner -->
+        <div class="welcome-banner">
+            <div class="welcome-content">
+                <div class="welcome-icon">🏠</div>
+                <div class="welcome-text">
+                    <h2>Welkom op de zolder van Paul!</h2>
+                    <p>Hier staan <strong>15 muizenvallen</strong> opgesteld. Welke vangt de meeste muizen? 🐭</p>
+                    <p class="welcome-cta">👉 Doe mee met de <a href="#" class="welcome-link" onclick="switchToTab('voorspelling'); return false;">voorspelling</a> en raad hoeveel muizen er in januari 2026 gevangen worden!</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Plattegrond Section -->
         <div id="plattegrond" class="section active">
             <div class="plattegrond-container">
                 <div class="plattegrond-header">
                     <div class="plattegrond-title">🏠 Zolder</div>
-                    <button class="edit-toggle" id="editToggle">
-                        <span>✏️</span>
-                        <span>Bewerken</span>
-                    </button>
                 </div>
                 <div class="plattegrond" id="plattegrondArea">
                     <!-- Horizontale scheidingsmuren -->
@@ -1097,11 +1222,6 @@
 
                     <!-- Muizenvallen worden dynamisch gegenereerd -->
                 </div>
-            </div>
-            
-            <div class="instruction" id="instruction">
-                <span>👆</span>
-                <p>Tik op een muizenval om een vangst te registreren!</p>
             </div>
         </div>
 
@@ -1139,6 +1259,65 @@
             <div class="top-traps">
                 <h3>🏆 Top Muizenvallen</h3>
                 <div id="topTraps">
+                    <!-- Dynamisch gevuld -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Voorspelling Section -->
+        <div id="voorspelling" class="section">
+            <div class="prediction-header">
+                <h2>🎯 Muizenjacht Voorspelling</h2>
+                <p class="prediction-subtitle">Raad hoeveel muizen er in januari 2026 gevangen worden!</p>
+            </div>
+
+            <div class="prediction-card">
+                <div class="prediction-info">
+                    <div class="info-item">
+                        <span class="info-icon">📅</span>
+                        <div>
+                            <div class="info-label">Deadline</div>
+                            <div class="info-value">15 januari 2026</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">📊</span>
+                        <div>
+                            <div class="info-label">Huidig totaal</div>
+                            <div class="info-value" id="currentTotal">0</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">👥</span>
+                        <div>
+                            <div class="info-label">Deelnemers</div>
+                            <div class="info-value" id="participantCount">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="predictionFormCard" class="prediction-card">
+                <h3>🎲 Doe je voorspelling</h3>
+                <form id="predictionForm">
+                    <div class="form-group">
+                        <label>👤 Je voornaam</label>
+                        <input type="text" id="predictionName" placeholder="Bijv. Jan" maxlength="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🐭 Aantal muizen in januari 2026</label>
+                        <input type="number" id="predictionNumber" placeholder="Bijv. 25" min="0" max="999" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitPrediction" style="width: 100%; margin-top: 1rem;">
+                        🎯 Verstuur voorspelling
+                    </button>
+                </form>
+                <div id="predictionStatus" style="margin-top: 1rem; text-align: center; display: none;"></div>
+            </div>
+
+            <div class="prediction-card">
+                <h3 id="leaderboardTitle">👥 Deelnemers</h3>
+                <div id="predictionLeaderboard">
                     <!-- Dynamisch gevuld -->
                 </div>
             </div>
@@ -1186,87 +1365,35 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-    <!-- Login Modal -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal" style="max-width: 350px;">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--secondary), var(--secondary-light));">
-                <h2>🔐 Inloggen</h2>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.95;">Alleen bekijken? Klik op "Bekijken zonder inloggen"</p>
-            </div>
-            <div class="modal-content">
-                <div id="loginForm">
-                    <div class="form-group">
-                        <label>📧 Email</label>
-                        <input type="email" id="loginEmail" placeholder="jouw@email.com" autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label>🔑 Wachtwoord</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
-                    </div>
-                    <div id="loginError" style="color: var(--primary); font-size: 0.85rem; margin-bottom: 1rem; display: none;"></div>
-                    <div class="btn-row">
-                        <button class="btn btn-primary" id="loginBtn">🔓 Inloggen</button>
-                    </div>
-                    <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E9ECEF;">
-                        <button class="btn btn-secondary" id="viewOnlyBtn" style="width: 100%;">👁️ Bekijken zonder inloggen</button>
-                    </div>
-                </div>
-                <div id="userInfo" style="display: none;">
-                    <div style="text-align: center; padding: 1rem;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
-                        <div style="font-weight: 600; margin-bottom: 0.25rem;" id="userEmail"></div>
-                        <div style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 1rem;">Je bent ingelogd</div>
-                        <button class="btn btn-secondary" id="logoutBtn" style="width: 100%;">Uitloggen</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
     <script>
         // Firebase Configuration
-        // VERVANG DIT MET JE EIGEN FIREBASE CONFIGURATIE
-        // Zie README.md voor instructies
+        // =====================
+        // Vul hier je Firebase configuratie in om data te synchroniseren:
         const firebaseConfig = {
-                apiKey: "AIzaSyCdp9C9jUCzGo_AtLadzq9xznVRLZaitkk",
-                authDomain: "muizenjacht-a7333.firebaseapp.com",
-                databaseURL: "https://muizenjacht-a7333-default-rtdb.europe-west1.firebasedatabase.app",
-                projectId: "muizenjacht-a7333",
-                storageBucket: "muizenjacht-a7333.firebasestorage.app",
-                messagingSenderId: "1749215724",
-                appId: "1:1749215724:web:8e39d42f1b096bcb1af8c9"
-            };
+            apiKey: "AIzaSyCdp9C9jUCzGo_AtLadzq9xznVRLZaitkk",
+            authDomain: "muizenjacht-a7333.firebaseapp.com",
+            databaseURL: "https://muizenjacht-a7333-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "muizenjacht-a7333",
+            storageBucket: "muizenjacht-a7333.firebasestorage.app",
+            messagingSenderId: "1749215724",
+            appId: "1:1749215724:web:8e39d42f1b096bcb1af8c9"
+        };
 
-        // Initialize Firebase (only if config is valid)
-        let firebaseApp = null;
+        // Initialize Firebase
         let database = null;
-        let auth = null;
         let useFirebase = false;
-        let currentUser = null;
-        let isAuthenticated = false;
 
         try {
             if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
-                firebaseApp = firebase.initializeApp(firebaseConfig);
+                firebase.initializeApp(firebaseConfig);
                 database = firebase.database();
-                auth = firebase.auth();
                 useFirebase = true;
-                console.log('✅ Firebase verbonden - data wordt gedeeld tussen apparaten');
-            } else {
-                console.log('ℹ️ Firebase niet geconfigureerd - gebruikt localStorage (lokaal)');
+                console.log('Firebase connected!');
             }
         } catch (error) {
-            console.error('Firebase initialisatie fout:', error);
-            useFirebase = false;
+            console.log('Firebase not available, using localStorage');
         }
-    </script>
 
-    <script>
         // Default trap positions (1-15, unique)
         const defaultPositions = {
             1: { left: 10, top: 88 },
@@ -1288,19 +1415,52 @@
 
         // Data management
         let catches = [];
-        let trapPositions = {...defaultPositions};
+        let trapPositions = JSON.parse(localStorage.getItem('muizenval-positions') || 'null') || {...defaultPositions};
+        let predictions = [];
         let currentTrap = null;
         let currentPhoto = null;
         let editMode = false;
         let draggingTrap = null;
-        let dataLoaded = false;
-        let viewOnlyMode = false;
-        let preventScroll = false;
+
+        // Voorspelling constants
+        const PREDICTION_DEADLINE = new Date('2026-01-15T23:59:59');
+        const PREDICTION_TARGET_MONTH = 0; // Januari (0-indexed)
+        const PREDICTION_TARGET_YEAR = 2026;
+
+        // Load catches from Firebase or localStorage
+        function loadCatches() {
+            if (useFirebase && database) {
+                try {
+                    database.ref('catches').on('value', (snapshot) => {
+                        catches = snapshot.val() || [];
+                        updateUI();
+                    });
+                } catch (error) {
+                    console.error('Firebase catches load error:', error);
+                    catches = JSON.parse(localStorage.getItem('muizenval-catches') || '[]');
+                }
+            } else {
+                catches = JSON.parse(localStorage.getItem('muizenval-catches') || '[]');
+            }
+        }
+
+        // Save catches to Firebase or localStorage
+        function saveCatches() {
+            if (useFirebase && database) {
+                try {
+                    database.ref('catches').set(catches);
+                } catch (error) {
+                    console.error('Firebase catches save error:', error);
+                    localStorage.setItem('muizenval-catches', JSON.stringify(catches));
+                }
+            } else {
+                localStorage.setItem('muizenval-catches', JSON.stringify(catches));
+            }
+        }
 
         // DOM Elements
         const totalScoreEl = document.getElementById('totalScore');
         const catchModal = document.getElementById('catchModal');
-        const loginModal = document.getElementById('loginModal');
         const modalTrapNumber = document.getElementById('modalTrapNumber');
         const catchDate = document.getElementById('catchDate');
         const catchTime = document.getElementById('catchTime');
@@ -1309,264 +1469,15 @@
         const photoViewer = document.getElementById('photoViewer');
         const viewerImage = document.getElementById('viewerImage');
         const plattegrondArea = document.getElementById('plattegrondArea');
-        const editToggle = document.getElementById('editToggle');
-        const instruction = document.getElementById('instruction');
-
-        // Data loading functions
-        function loadData() {
-            if (useFirebase && database) {
-                try {
-                    // Load catches from Firebase
-                    const catchesRef = database.ref('catches');
-                    catchesRef.on('value', (snapshot) => {
-                        catches = snapshot.val() || [];
-                        updateUI();
-                    });
-
-                    // Load trap positions from Firebase
-                    const positionsRef = database.ref('trapPositions');
-                    positionsRef.on('value', (snapshot) => {
-                        const savedPositions = snapshot.val();
-                        if (savedPositions) {
-                            trapPositions = {...defaultPositions, ...savedPositions};
-                        }
-                        renderTraps();
-                        if (!dataLoaded) {
-                            dataLoaded = true;
-                            showToast('✅ Verbonden - data wordt gesynchroniseerd');
-                        }
-                    });
-
-                    // Initial load - wait for first data
-                    catchesRef.once('value', (snapshot) => {
-                        catches = snapshot.val() || [];
-                        positionsRef.once('value', (snapshot) => {
-                            const savedPositions = snapshot.val();
-                            if (savedPositions) {
-                                trapPositions = {...defaultPositions, ...savedPositions};
-                            }
-                            renderTraps();
-                            updateUI();
-                            if (!dataLoaded) {
-                                dataLoaded = true;
-                                showToast('✅ Verbonden - data wordt gesynchroniseerd');
-                            }
-                        });
-                    });
-                } catch (error) {
-                    console.error('Firebase load error:', error);
-                    loadFromLocalStorage();
-                }
-            } else {
-                loadFromLocalStorage();
-            }
-        }
-
-        function loadFromLocalStorage() {
-            catches = JSON.parse(localStorage.getItem('muizenval-catches') || '[]');
-            const savedPositions = JSON.parse(localStorage.getItem('muizenval-positions') || 'null');
-            if (savedPositions) {
-                trapPositions = {...defaultPositions, ...savedPositions};
-            }
-            dataLoaded = true;
-            renderTraps();
-            updateUI();
-        }
-
-        function saveData() {
-            // Only save if authenticated (or not using Firebase)
-            if (!useFirebase) {
-                saveToLocalStorage();
-                return;
-            }
-
-            if (!isAuthenticated && !viewOnlyMode) {
-                showToast('⚠️ Je moet ingelogd zijn om wijzigingen op te slaan');
-                return;
-            }
-
-            if (useFirebase && database && isAuthenticated) {
-                try {
-                    // Save to Firebase
-                    database.ref('catches').set(catches);
-                    database.ref('trapPositions').set(trapPositions);
-                } catch (error) {
-                    console.error('Firebase save error:', error);
-                    showToast('❌ Fout bij opslaan: ' + error.message);
-                }
-            } else {
-                saveToLocalStorage();
-            }
-        }
-
-        // Authentication functions
-        async function signInWithEmail(email, password) {
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                currentUser = userCredential.user;
-                isAuthenticated = true;
-                viewOnlyMode = false;
-                loginModal.classList.remove('active');
-                showToast('✅ Ingelogd! Je kunt nu wijzigingen maken.');
-                updateUIForAuth();
-                return true;
-            } catch (error) {
-                document.getElementById('loginError').textContent = error.message;
-                document.getElementById('loginError').style.display = 'block';
-                return false;
-            }
-        }
-
-        async function signInAnonymously() {
-            try {
-                const userCredential = await auth.signInAnonymously();
-                currentUser = userCredential.user;
-                isAuthenticated = false; // Anonymous users can't write
-                viewOnlyMode = true;
-                loginModal.classList.remove('active');
-                showToast('👁️ Bekijkmodus - je kunt alleen bekijken');
-                updateUIForAuth();
-                return true;
-            } catch (error) {
-                console.error('Anonymous sign-in error:', error);
-                showToast('❌ Fout bij anoniem inloggen');
-                return false;
-            }
-        }
-
-        async function signOut() {
-            try {
-                await auth.signOut();
-                currentUser = null;
-                isAuthenticated = false;
-                viewOnlyMode = false;
-                showToast('👋 Uitgelogd');
-                updateUIForAuth();
-                loginModal.classList.add('active');
-            } catch (error) {
-                console.error('Sign out error:', error);
-            }
-        }
-
-        function updateUIForAuth() {
-            // Update user badge in header
-            const userBadge = document.getElementById('userBadge');
-            const userEmailBadge = document.getElementById('userEmailBadge');
-            if (userBadge && userEmailBadge) {
-                if (currentUser && !currentUser.isAnonymous) {
-                    userBadge.style.display = 'flex';
-                    userEmailBadge.textContent = currentUser.email || 'Ingelogd';
-                } else {
-                    userBadge.style.display = 'none';
-                }
-            }
-
-            // Update login button in tabs
-            const headerLoginBtn = document.getElementById('headerLoginBtn');
-            const loginBtnText = document.getElementById('loginBtnText');
-            if (headerLoginBtn && loginBtnText) {
-                if (isAuthenticated) {
-                    headerLoginBtn.classList.add('logged-in');
-                    loginBtnText.textContent = '🚪 Uitloggen';
-                    headerLoginBtn.title = 'Klik om uit te loggen';
-                } else if (viewOnlyMode) {
-                    headerLoginBtn.classList.add('logged-in');
-                    loginBtnText.textContent = '👁️ Bekijkmodus';
-                    headerLoginBtn.title = 'Klik om uit te loggen en in te loggen';
-                } else {
-                    headerLoginBtn.classList.remove('logged-in');
-                    loginBtnText.textContent = '🔐 Login';
-                    headerLoginBtn.title = 'Klik om in te loggen';
-                }
-            }
-
-            // Hide/show edit button
-            if (editToggle) {
-                if (isAuthenticated) {
-                    editToggle.style.display = 'flex';
-                } else {
-                    editToggle.style.display = 'none';
-                }
-            }
-
-            // Disable trap clicks for non-authenticated users
-            document.querySelectorAll('.muizenval').forEach(trap => {
-                if (!isAuthenticated && !viewOnlyMode) {
-                    trap.style.opacity = '0.6';
-                    trap.style.cursor = 'not-allowed';
-                } else if (viewOnlyMode) {
-                    trap.style.opacity = '0.8';
-                    trap.style.cursor = 'default';
-                } else {
-                    trap.style.opacity = '1';
-                    trap.style.cursor = 'pointer';
-                }
-            });
-
-            // Update instruction text
-            if (instruction) {
-                if (viewOnlyMode) {
-                    instruction.innerHTML = `
-                        <span>👁️</span>
-                        <p>Bekijkmodus - log in om wijzigingen te maken</p>
-                    `;
-                } else if (!isAuthenticated) {
-                    instruction.innerHTML = `
-                        <span>🔐</span>
-                        <p>Log in om vangsten toe te voegen of de plattegrond aan te passen</p>
-                    `;
-                } else {
-                    instruction.innerHTML = `
-                        <span>👆</span>
-                        <p>Tik op een muizenval om een vangst te registreren!</p>
-                    `;
-                }
-            }
-
-            // Update vangsten list to show/hide delete buttons
-            updateVangstenList();
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem('muizenval-catches', JSON.stringify(catches));
-            localStorage.setItem('muizenval-positions', JSON.stringify(trapPositions));
-        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            loadCatches();
+            renderTraps();
+            updateUI();
             setupEventListeners();
             setDefaultDateTime();
-            
-            // Setup Firebase Auth state listener
-            if (useFirebase && auth) {
-                auth.onAuthStateChanged((user) => {
-                    if (user) {
-                        currentUser = user;
-                        // Check if user is anonymous
-                        if (user.isAnonymous) {
-                            isAuthenticated = false;
-                            viewOnlyMode = true;
-                        } else {
-                            isAuthenticated = true;
-                            viewOnlyMode = false;
-                        }
-                        updateUIForAuth();
-                        loadData();
-                    } else {
-                        // No user, show login modal
-                        currentUser = null;
-                        isAuthenticated = false;
-                        viewOnlyMode = false;
-                        loginModal.classList.add('active');
-                        updateUIForAuth();
-                        // Still load data for viewing
-                        loadData();
-                    }
-                });
-            } else {
-                // No Firebase, just load data
-                loadData();
-            }
+            loadPredictions();
         });
 
         function renderTraps() {
@@ -1594,15 +1505,6 @@
                 // Click handler
                 trap.addEventListener('click', (e) => {
                     if (!editMode) {
-                        if (!isAuthenticated && !viewOnlyMode) {
-                            showToast('🔐 Log in om een vangst toe te voegen');
-                            loginModal.classList.add('active');
-                            return;
-                        }
-                        if (viewOnlyMode) {
-                            showToast('👁️ Bekijkmodus - log in om wijzigingen te maken');
-                            return;
-                        }
                         openModal(trap.dataset.trap);
                     }
                 });
@@ -1625,66 +1527,15 @@
                     });
                     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
                     btn.classList.add('active');
-                    document.getElementById(btn.dataset.tab).classList.add('active');
-                });
-            });
-
-            // Login button in header
-            const headerLoginBtn = document.getElementById('headerLoginBtn');
-            if (headerLoginBtn) {
-                headerLoginBtn.addEventListener('click', () => {
-                    if (isAuthenticated || viewOnlyMode) {
-                        // User is logged in, show logout option
-                        signOut();
-                    } else {
-                        // User is not logged in, show login modal
-                        loginModal.classList.add('active');
+                    const targetSection = document.getElementById(btn.dataset.tab);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        // Update predictions when switching to that tab
+                        if (btn.dataset.tab === 'voorspelling') {
+                            updatePredictionUI();
+                        }
                     }
                 });
-            }
-
-            // Edit toggle
-            if (editToggle) {
-                editToggle.addEventListener('click', () => {
-                    if (!isAuthenticated) {
-                        showToast('🔐 Log in om de plattegrond aan te passen');
-                        loginModal.classList.add('active');
-                        return;
-                    }
-                    toggleEditMode();
-                });
-            }
-
-            // Login modal buttons
-            document.getElementById('loginBtn').addEventListener('click', async () => {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                if (!email || !password) {
-                    document.getElementById('loginError').textContent = 'Vul email en wachtwoord in';
-                    document.getElementById('loginError').style.display = 'block';
-                    return;
-                }
-                await signInWithEmail(email, password);
-            });
-
-            document.getElementById('viewOnlyBtn').addEventListener('click', async () => {
-                await signInAnonymously();
-            });
-
-            if (document.getElementById('logoutBtn')) {
-                document.getElementById('logoutBtn').addEventListener('click', signOut);
-            }
-
-            if (document.getElementById('headerLogoutBtn')) {
-                document.getElementById('headerLogoutBtn').addEventListener('click', signOut);
-            }
-
-            // Login modal close
-            loginModal.addEventListener('click', (e) => {
-                if (e.target === loginModal && !currentUser) {
-                    // Don't allow closing if not logged in
-                    e.preventDefault();
-                }
             });
 
             // Modal buttons
@@ -1713,61 +1564,28 @@
             document.addEventListener('touchmove', drag, { passive: false });
             document.addEventListener('mouseup', endDrag);
             document.addEventListener('touchend', endDrag);
-            document.addEventListener('touchcancel', endDrag);
-            
-            // Prevent body scroll during drag on mobile
-            document.addEventListener('touchmove', (e) => {
-                if (preventScroll && draggingTrap) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
+
+            // Voorspelling form
+            const predictionForm = document.getElementById('predictionForm');
+            if (predictionForm) {
+                predictionForm.addEventListener('submit', handlePredictionSubmit);
+            }
         }
 
         function toggleEditMode() {
-            if (!isAuthenticated) {
-                showToast('🔐 Log in om de plattegrond aan te passen');
-                loginModal.classList.add('active');
-                return;
-            }
-            
             editMode = !editMode;
-            editToggle.classList.toggle('active', editMode);
             plattegrondArea.classList.toggle('edit-mode', editMode);
-            instruction.classList.toggle('edit-mode', editMode);
-
-            if (editMode) {
-                instruction.innerHTML = `
-                    <span>✋</span>
-                    <p>Sleep de vallen naar de gewenste positie. Tik op "Bewerken" om te stoppen.</p>
-                `;
-            } else {
-                instruction.innerHTML = `
-                    <span>👆</span>
-                    <p>Tik op een muizenval om een vangst te registreren!</p>
-                `;
-            }
         }
 
         function startDrag(e) {
-            if (!editMode || !isAuthenticated) {
-                if (!isAuthenticated) {
-                    showToast('🔐 Log in om de plattegrond aan te passen');
-                    loginModal.classList.add('active');
-                }
-                return;
-            }
+            if (!editMode) return;
             
             e.preventDefault();
-            e.stopPropagation();
             const trap = e.target.closest('.muizenval');
             if (!trap) return;
 
             draggingTrap = trap;
             trap.classList.add('dragging');
-            
-            // Prevent body scroll on mobile during drag
-            preventScroll = true;
-            document.body.style.overflow = 'hidden';
         }
 
         function drag(e) {
@@ -1806,14 +1624,10 @@
 
             // Save new position
             trapPositions[trapNum] = { left, top };
-            saveData();
+            localStorage.setItem('muizenval-positions', JSON.stringify(trapPositions));
 
             draggingTrap.classList.remove('dragging');
             draggingTrap = null;
-
-            // Re-enable body scroll
-            preventScroll = false;
-            document.body.style.overflow = '';
 
             showToast('Positie opgeslagen!');
         }
@@ -1881,7 +1695,7 @@
             };
 
             catches.unshift(newCatch);
-            saveData();
+            saveCatches();
             
             closeModal();
             updateUI();
@@ -1892,16 +1706,10 @@
         }
 
         function deleteCatch(id) {
-            if (!isAuthenticated) {
-                showToast('🔐 Log in om vangsten te verwijderen');
-                loginModal.classList.add('active');
-                return;
-            }
-            
             if (!confirm('Weet je zeker dat je deze vangst wilt verwijderen?')) return;
             
             catches = catches.filter(c => c.id !== id);
-            saveData();
+            saveCatches();
             updateUI();
         }
 
@@ -1948,6 +1756,11 @@
 
             // Update stats
             updateStats();
+
+            // Update predictions (if on that tab)
+            if (document.getElementById('voorspelling')?.classList.contains('active')) {
+                updatePredictionUI();
+            }
         }
 
         function updateVangstenList() {
@@ -1987,7 +1800,7 @@
                         </div>
                         <div class="vangst-actions">
                             ${c.photo ? `<button class="btn-view" onclick="viewPhoto('${c.photo}')">👁</button>` : ''}
-                            ${isAuthenticated ? `<button class="btn-delete" onclick="deleteCatch(${c.id})">🗑</button>` : ''}
+                            <button class="btn-delete" onclick="deleteCatch(${c.id})">🗑</button>
                         </div>
                     </div>
                 `;
@@ -2035,7 +1848,7 @@
         }
 
         function showConfetti() {
-            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3'];
+            const colors = ['#C97D60', '#5D7C47', '#F4A460', '#8B7355'];
             
             for (let i = 0; i < 30; i++) {
                 const confetti = document.createElement('div');
@@ -2072,9 +1885,270 @@
             }
         }
 
+        // Voorspelling functions
+        function loadPredictions() {
+            if (useFirebase && database) {
+                try {
+                    const predictionsRef = database.ref('predictions');
+                    predictionsRef.on('value', (snapshot) => {
+                        const firebaseData = snapshot.val();
+                        if (firebaseData) {
+                            // Firebase returns an object, convert to array
+                            predictions = Array.isArray(firebaseData) 
+                                ? firebaseData 
+                                : Object.values(firebaseData);
+                        } else {
+                            predictions = [];
+                        }
+                        updatePredictionUI();
+                    }, (error) => {
+                        console.error('Firebase predictions read error:', error);
+                        predictions = JSON.parse(localStorage.getItem('muizenval-predictions') || '[]');
+                        updatePredictionUI();
+                    });
+                } catch (error) {
+                    console.error('Firebase predictions load error:', error);
+                    predictions = JSON.parse(localStorage.getItem('muizenval-predictions') || '[]');
+                    updatePredictionUI();
+                }
+            } else {
+                predictions = JSON.parse(localStorage.getItem('muizenval-predictions') || '[]');
+                updatePredictionUI();
+            }
+        }
+
+        function savePredictions() {
+            // Always save to localStorage as backup
+            localStorage.setItem('muizenval-predictions', JSON.stringify(predictions));
+            
+            if (useFirebase && database) {
+                try {
+                    database.ref('predictions').set(predictions)
+                        .catch(error => {
+                            console.log('Firebase predictions save error (permission issue):', error.message);
+                            // Data is already saved to localStorage
+                        });
+                } catch (error) {
+                    console.log('Firebase predictions save error:', error.message);
+                }
+            }
+        }
+
+        function getJanuary2026Total() {
+            const janStart = new Date(2026, 0, 1);
+            const janEnd = new Date(2026, 1, 1);
+            return catches.filter(c => {
+                const catchDate = new Date(c.date);
+                return catchDate >= janStart && catchDate < janEnd;
+            }).length;
+        }
+
+        function isPredictionOpen() {
+            const now = new Date();
+            return now < PREDICTION_DEADLINE;
+        }
+
+        function handlePredictionSubmit(e) {
+            e.preventDefault();
+            
+            if (!isPredictionOpen()) {
+                showPredictionStatus('De deadline is verstreken. Je kunt niet meer meedoen.', 'error');
+                return;
+            }
+
+            const name = document.getElementById('predictionName').value.trim();
+            const number = parseInt(document.getElementById('predictionNumber').value);
+
+            if (!name || name.length < 2) {
+                showPredictionStatus('Voer een geldige voornaam in (minimaal 2 tekens)', 'error');
+                return;
+            }
+
+            if (isNaN(number) || number < 0 || number > 999) {
+                showPredictionStatus('Voer een geldig aantal in (0-999)', 'error');
+                return;
+            }
+
+            // Check if name already exists
+            if (predictions.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+                showPredictionStatus('Deze naam is al gebruikt. Kies een andere naam.', 'error');
+                return;
+            }
+
+            const newPrediction = {
+                id: Date.now(),
+                name: name,
+                prediction: number,
+                createdAt: new Date().toISOString()
+            };
+
+            predictions.push(newPrediction);
+            savePredictions();
+            
+            document.getElementById('predictionForm').reset();
+            showPredictionStatus('🎉 Je voorspelling is opgeslagen! Succes!', 'success');
+            updatePredictionUI();
+            showConfetti();
+        }
+
+        function showPredictionStatus(message, type) {
+            const statusEl = document.getElementById('predictionStatus');
+            statusEl.textContent = message;
+            statusEl.className = `prediction-status ${type}`;
+            statusEl.style.display = 'block';
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function updatePredictionUI() {
+            const janTotal = getJanuary2026Total();
+            const isOpen = isPredictionOpen();
+            
+            // Update current total
+            const currentTotalEl = document.getElementById('currentTotal');
+            if (currentTotalEl) {
+                currentTotalEl.textContent = janTotal;
+            }
+
+            // Update participant count
+            const participantCountEl = document.getElementById('participantCount');
+            if (participantCountEl) {
+                participantCountEl.textContent = predictions.length;
+            }
+
+            // Show/hide form based on deadline
+            const formCard = document.getElementById('predictionFormCard');
+            if (formCard) {
+                if (!isOpen) {
+                    formCard.innerHTML = `
+                        <div class="prediction-status info">
+                            <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">⏰</div>
+                            <div>De deadline is verstreken. Je kunt niet meer meedoen.</div>
+                            <div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Huidig totaal: ${janTotal} muizen</div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Update leaderboard
+            updatePredictionLeaderboard(janTotal);
+        }
+
+        function updatePredictionLeaderboard(actualTotal) {
+            const leaderboardEl = document.getElementById('predictionLeaderboard');
+            if (!leaderboardEl) return;
+
+            if (predictions.length === 0) {
+                leaderboardEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🎯</div>
+                        <h3>Nog geen voorspellingen</h3>
+                        <p>Wees de eerste die een voorspelling doet!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Check if January 2026 is over (show rankings after Feb 1, 2026)
+            const now = new Date();
+            const resultsDate = new Date('2026-02-01');
+            const showResults = now >= resultsDate;
+
+            // Update title based on results
+            const titleEl = document.getElementById('leaderboardTitle');
+            if (titleEl) {
+                titleEl.textContent = showResults ? '🏆 Leaderboard' : '👥 Deelnemers';
+            }
+
+            if (showResults) {
+                // After January 2026: Show rankings based on accuracy
+                const predictionsWithDiff = predictions.map(p => ({
+                    ...p,
+                    difference: Math.abs(p.prediction - actualTotal)
+                })).sort((a, b) => a.difference - b.difference);
+
+                leaderboardEl.innerHTML = predictionsWithDiff.map((p, index) => {
+                    const rank = index + 1;
+                    let rankClass = '';
+                    let rankIcon = rank;
+                    
+                    if (rank === 1) {
+                        rankClass = 'gold';
+                        rankIcon = '🥇';
+                    } else if (rank === 2) {
+                        rankClass = 'silver';
+                        rankIcon = '🥈';
+                    } else if (rank === 3) {
+                        rankClass = 'bronze';
+                        rankIcon = '🥉';
+                    }
+
+                    const isClose = p.difference <= 2;
+                    const diffText = p.difference === 0 
+                        ? '🎯 Perfect!' 
+                        : p.difference === 1 
+                            ? 'Bijna perfect! (+/- 1)' 
+                            : `Verschil: ${p.difference}`;
+
+                    return `
+                        <div class="prediction-entry ${rank <= 3 ? 'winner' : ''}">
+                            <div class="prediction-rank ${rankClass}">${rankIcon}</div>
+                            <div class="prediction-details">
+                                <div class="prediction-name">${escapeHtml(p.name)}</div>
+                                <div class="prediction-number">${p.prediction} 🐭</div>
+                                <div class="prediction-difference ${isClose ? 'close' : ''}">${diffText}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Before results: Show simple participant list sorted by submission time
+                const sortedPredictions = [...predictions].sort((a, b) => 
+                    new Date(a.createdAt) - new Date(b.createdAt)
+                );
+
+                leaderboardEl.innerHTML = sortedPredictions.map((p, index) => {
+                    return `
+                        <div class="prediction-entry participant">
+                            <div class="prediction-rank participant-number">${index + 1}</div>
+                            <div class="prediction-details">
+                                <div class="prediction-name">${escapeHtml(p.name)}</div>
+                                <div class="prediction-number">${p.prediction} 🐭</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize predictions on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPredictions();
+        });
+
+        // Switch to a specific tab
+        function switchToTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.toggle('active', section.id === tabName);
+            });
+            // Scroll to top of content
+            document.querySelector('.content').scrollIntoView({ behavior: 'smooth' });
+        }
+
         // Make functions global for onclick handlers
         window.viewPhoto = viewPhoto;
         window.deleteCatch = deleteCatch;
+        window.switchToTab = switchToTab;
     </script>
 </body>
 </html>

@@ -27,67 +27,11 @@ Open `index.html` in je browser of bezoek de GitHub Pages URL.
 3. **Posities aanpassen**: Klik op "Bewerken" om vallen te verplaatsen
 4. **Statistieken bekijken**: Ga naar de "Stats" tab voor overzichten
 
-## 🔥 Firebase Setup (Optioneel - voor gedeelde data)
-
-De applicatie werkt standaard met **localStorage** (data blijft lokaal op elk apparaat). Voor **gedeelde data tussen apparaten** (bijv. jij en je vriendin zien dezelfde vangsten), kun je Firebase Realtime Database gebruiken.
-
-### Firebase Setup Stappen:
-
-1. **Maak een Firebase project aan:**
-   - Ga naar [Firebase Console](https://console.firebase.google.com/)
-   - Klik op "Add project" of "Create a project"
-   - Geef je project een naam (bijv. "muizenval-scorebord")
-   - Volg de wizard
-
-2. **Activeer Realtime Database:**
-   - In je Firebase project, ga naar "Realtime Database" in het linkermenu
-   - Klik op "Create Database"
-   - Kies "Start in test mode" (voor nu)
-   - Kies een locatie (bijv. "europe-west1" voor Nederland)
-   - Klik "Enable"
-
-3. **Krijg je Firebase configuratie:**
-   - Ga naar Project Settings (⚙️ icoon naast "Project Overview")
-   - Scroll naar beneden naar "Your apps"
-   - Klik op het web icoon (</>)
-   - Geef je app een naam (bijv. "Muizenval App")
-   - Kopieer de `firebaseConfig` object
-
-4. **Voeg configuratie toe aan de app:**
-   - Open `index.html` in een editor
-   - Zoek naar `const firebaseConfig = {`
-   - Vervang de placeholder waarden met je eigen Firebase configuratie
-   - Sla het bestand op
-
-5. **Pas database regels aan (veiligheid):**
-   - Ga terug naar Realtime Database in Firebase Console
-   - Klik op "Rules" tab
-   - Vervang de regels met:
-   ```json
-   {
-     "rules": {
-       ".read": true,
-       ".write": true
-     }
-   }
-   ```
-   - Klik "Publish"
-   
-   ⚠️ **Let op:** Deze regels maken de database publiek leesbaar/schrijfbaar. 
-   
-   **Voor beveiliging met authenticatie (aanbevolen):** Zie `AUTH_SETUP.md` voor instructies om alleen geautoriseerde gebruikers te laten wijzigen.
-
-### Zonder Firebase:
-Als je Firebase niet configureert, werkt de app gewoon met localStorage. Data blijft dan lokaal op elk apparaat.
-
 ## 💡 Technische details
 
-- Pure HTML/CSS/JavaScript
-- **Data opslag opties:**
-  - Firebase Realtime Database (gedeeld tussen apparaten) - optioneel
-  - localStorage (lokaal per apparaat) - standaard fallback
-- Real-time synchronisatie wanneer Firebase is geconfigureerd
-- Werkt offline (localStorage) of met real-time sync (Firebase)
+- Pure HTML/CSS/JavaScript - geen dependencies nodig
+- Data wordt lokaal opgeslagen in de browser (localStorage)
+- Werkt volledig offline na eerste keer laden
 - Responsive design voor alle schermformaten
 
 ## 📄 Licentie
