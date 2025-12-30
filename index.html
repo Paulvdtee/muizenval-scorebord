@@ -1281,13 +1281,6 @@
                         </div>
                     </div>
                     <div class="info-item">
-                        <span class="info-icon">📊</span>
-                        <div>
-                            <div class="info-label">Huidig totaal</div>
-                            <div class="info-value" id="currentTotal">0</div>
-                        </div>
-                    </div>
-                    <div class="info-item">
                         <span class="info-icon">👥</span>
                         <div>
                             <div class="info-label">Deelnemers</div>
@@ -2004,12 +1997,7 @@
         function updatePredictionUI() {
             const janTotal = getJanuary2026Total();
             const isOpen = isPredictionOpen();
-            
-            // Update current total
-            const currentTotalEl = document.getElementById('currentTotal');
-            if (currentTotalEl) {
-                currentTotalEl.textContent = janTotal;
-            }
+
 
             // Update participant count
             const participantCountEl = document.getElementById('participantCount');
@@ -2025,7 +2013,6 @@
                         <div class="prediction-status info">
                             <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">⏰</div>
                             <div>De deadline is verstreken. Je kunt niet meer meedoen.</div>
-                            <div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Huidig totaal: ${janTotal} muizen</div>
                         </div>
                     `;
                 }
